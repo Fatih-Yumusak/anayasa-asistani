@@ -1,25 +1,22 @@
 import json
 import os
+import math
 from typing import List, Dict, Any
 
 class VectorStoreVercel:
     def __init__(self, embeddings_path: str = "backend/data/embeddings_gemini.json"):
         self.embeddings_path = embeddings_path
         self.documents = []
-        self.vectors = None
+        self.vectors = [] # List of lists (not numpy array)
         self.model_name = 'models/text-embedding-004'
         self.api_key = os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY not found in env")
             
         # Lazy load data only when needed (or we can load here if we want to fail fast)
-        # For Vercel, it's better to load fast.
         self._load_data()
 
     def _load_data(self):
-        # Local import to reduce cold start time
-        import numpy as np
-        
         if not os.path.exists(self.embeddings_path):
              print(f"Warning: {self.embeddings_path} not found. DB empty.")
              return
@@ -28,48 +25,58 @@ class VectorStoreVercel:
             data = json.load(f)
             
         self.documents = data
-        # Convert list of lists to numpy array for fast calculation
-        self.vectors = np.array([d['embedding'] for d in data])
+        self.vectors = [d['embedding'] for d in data]
         print(f"Vector Store Loaded: {len(self.documents)} docs.")
         
     def query(self, query_text: str, n_results: int = 5):
-        # Local imports
-        import numpy as np
+        # Local import used to be here, now removed.
         import google.generativeai as genai
         
         genai.configure(api_key=self.api_key)
 
         # 1. Embed Query
-        # Task type retrieval_query specific for query side
         q_embed = genai.embed_content(
             model=self.model_name,
             content=query_text,
             task_type="retrieval_query"
         )
-        query_vector = np.array(q_embed['embedding'])
+        query_vector = q_embed['embedding']
         
-        # 2. Cosine Similarity
-        # Dot product of normalized vectors = Cosine Similarity
-        # Note: Gemini embeddings are usually already normalized? Let's assume so or normalize.
-        # Check norm
-        norm = np.linalg.norm(query_vector)
-        if norm > 0:
-            query_vector = query_vector / norm
+        # 2. Cosine Similarity (Pure Python)
+        
+        # Calculate norm of query vector
+        query_norm = math.sqrt(sum(x * x for x in query_vector))
+        
+        scores = []
+        for doc_vec in self.vectors:
+            # Dot Product
+            dot_product = sum(a * b for a, b in zip(doc_vec, query_vector))
+            # Doc vectors are usually normalized by embedding model, but let's be safe?
+            # Assuming pre-computed vectors are normalized or we trust dot product for ranking if query is normalized.
+            # Actually for cosine similarity: (A . B) / (|A| * |B|)
+            # If we assume doc vectors |B| approx 1 (usually true for embeddings), and we normalize A...
             
-        # Vectorized dot product
-        # vectors shape: (N, D), query shape: (D,) -> scores: (N,)
-        scores = np.dot(self.vectors, query_vector)
+            # Let's do full cosine for correctness
+            doc_norm = math.sqrt(sum(x * x for x in doc_vec))
+            
+            if query_norm * doc_norm == 0:
+                score = 0.0
+            else:
+                score = dot_product / (query_norm * doc_norm)
+            scores.append(score)
         
         # 3. Get Top K
-        # argsort returns indices of sorted elements (ascending)
-        top_indices = np.argsort(scores)[-n_results:][::-1]
+        # Create list of (index, score)
+        indexed_scores = list(enumerate(scores))
+        # Sort by score descending
+        indexed_scores.sort(key=lambda x: x[1], reverse=True)
+        
+        top_indices = [x[0] for x in indexed_scores[:n_results]]
         
         results = {
             "documents": [],
             "metadatas": [],
-            "distances": [] # We return distances to match Chroma interface (1 - score or similar)
-            # Actually Chroma returns distance (lower better for L2, higher better for Cosine?)
-            # We used Cosine Space in Chroma. Chroma Cosine distance = 1 - Cosine Similarity.
+            "distances": [] 
         }
         
         for idx in top_indices:
@@ -77,14 +84,11 @@ class VectorStoreVercel:
             score = scores[idx]
             results["documents"].append(doc["text"])
             results["metadatas"].append(doc["metadata"])
-            # Convert similarity to distance (0.0 to 1.0)
-            # 1.0 similarity -> 0.0 distance
+            # Convert similarity to distance
             results["distances"].append(1.0 - score) 
             
-        # Format to match ChromaDB list-of-lists structure if needed, or simplify RAGEngine
-        # RAGEngine expects: results['documents'][0], results['metadatas'][0], etc.
         return {
-            "documents": [results["documents"]], # Chroma returns list of lists (batch)
+            "documents": [results["documents"]],
             "metadatas": [results["metadatas"]],
             "distances": [results["distances"]]
         }
