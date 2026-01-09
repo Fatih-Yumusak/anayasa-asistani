@@ -17,7 +17,7 @@ export default function Home() {
   const [readerState, setReaderState] = useState<{ targetId: string, source: string } | null>(null);
 
   // Environment aware API URL
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE = process.env.NODE_ENV === 'production' ? '' : "http://localhost:8000";
 
   const handleSearch = async () => {
     if (!query.trim()) return;
