@@ -12,12 +12,10 @@ class RAGEngine:
             
     def _initialize_lazy(self):
         if self.vector_store is None:
-            print("Lazy Loading: Vector Store & Gemini...")
-            import google.generativeai as genai
-            
+            print("Lazy Loading: Vector Store...")
+            # genai import REMOVED
             self.vector_store = VectorStoreVercel()
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-2.0-flash')
+            # No need to configure genai or init model object
             print("Lazy Loading Complete.")
 
     def retrieve(self, question: str, k: int = 5):
@@ -97,11 +95,24 @@ Soru: {question}""")
         # 2. Generate Prompt
         prompt_text = self.generate_prompt_content(question, context_docs)
         
-        # 3. Call LLM
-        print("Generating answer with Gemini...")
+        # 3. Call LLM (REST API)
+        print("Generating answer with Gemini (REST)...")
+        import requests
+        
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={self.api_key}"
+        
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt_text}]
+            }]
+        }
+        
         try:
-            response = self.model.generate_content(prompt_text)
-            answer = response.text
+            resp = requests.post(url, json=payload, timeout=30)
+            resp.raise_for_status()
+            data = resp.json()
+            # Extract text: candidates[0].content.parts[0].text
+            answer = data['candidates'][0]['content']['parts'][0]['text']
         except Exception as e:
             return {
                 "answer": f"API Hatası: {str(e)}",

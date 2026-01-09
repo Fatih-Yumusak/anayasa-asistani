@@ -30,17 +30,28 @@ class VectorStoreVercel:
         
     def query(self, query_text: str, n_results: int = 5):
         # Local import used to be here, now removed.
-        import google.generativeai as genai
+        import requests
         
-        genai.configure(api_key=self.api_key)
-
         # 1. Embed Query
-        q_embed = genai.embed_content(
-            model=self.model_name,
-            content=query_text,
-            task_type="retrieval_query"
-        )
-        query_vector = q_embed['embedding']
+        url = f"https://generativelanguage.googleapis.com/v1beta/{self.model_name}:embedContent?key={self.api_key}"
+        
+        payload = {
+            "content": {
+                "parts": [{ "text": query_text }]
+            },
+            "taskType": "RETRIEVAL_QUERY"
+        }
+        
+        try:
+            resp = requests.post(url, json=payload, timeout=10)
+            resp.raise_for_status() # Raise for 4xx/5xx
+            frame = resp.json()
+            # Extract embedding: frame['embedding']['values']
+            query_vector = frame['embedding']['values']
+        except Exception as e:
+            print(f"Embedding API Error: {e}")
+            # Fallback or empty result to avoid crash
+            return {"documents": [[]], "metadatas": [[]], "distances": [[]]}
         
         # 2. Cosine Similarity (Pure Python)
         
