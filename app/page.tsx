@@ -24,46 +24,64 @@ export default function Home() {
     setLoading(true);
     setResponse(null);
     setProgress(0);
-    setStage("Başlatılıyor...");
+    setStage("Veritabanı taranıyor...");
 
-    // Simulation Timer
+    // Simulation Timer for visual feedback
     let progressTimer: NodeJS.Timeout | undefined;
+    progressTimer = setInterval(() => {
+      setProgress(prev => {
+        if (prev < 90) return prev + 2;
+        return prev;
+      });
+    }, 200);
 
     try {
-      // 1. Retrieval Phase Simulation (Fast)
-      setStage("Anayasa maddeleri taranıyor...");
-      setProgress(10);
+      // PHASE 1: RETRIEVAL
+      // This is now a real network call, ~1-3s
+      const retrieveRes = await axios.post(`${API_BASE}/api/retrieve`, { question: query });
+      const contextDocs = retrieveRes.data.context_docs || [];
 
-      progressTimer = setInterval(() => {
-        setProgress((prev) => {
-          // Slow down as we get closer to 90%
-          if (prev < 30) return prev + 5;
-          if (prev < 60) {
-            setStage("İlgili maddeler bulundu. Cevap üretiliyor (1.5B Model)...");
-            return prev + 2;
-          }
-          if (prev < 90) return prev + 0.5; // Very slow crawl for generation
-          return prev;
-        });
-      }, 500);
+      setProgress(50);
 
-      const res = await axios.post(`${API_BASE}/api/chat`, { question: query });
+      if (contextDocs.length > 0) {
+        setStage(`İlgili ${contextDocs.length} madde bulundu. Cevap üretiliyor...`);
+      } else {
+        setStage("Doğrudan bilgi bulunamadı, genel cevap üretiliyor...");
+      }
+
+      // PHASE 2: GENERATION
+      // This is another network call, ~2-5s
+      // Sending context back to server is stateless and efficient
+      const generateRes = await axios.post(`${API_BASE}/api/answer`, {
+        question: query,
+        context_docs: contextDocs
+      });
 
       // Done
       if (progressTimer) clearInterval(progressTimer);
       setProgress(100);
       setStage("Tamamlandı.");
 
-      // Small delay to show 100% before showing result
+      // Construct final response object compatible with UI
+      const finalResult = {
+        answer: generateRes.data.answer,
+        sources: contextDocs.map((doc: any) => ({
+          madde: doc.madde_no,
+          text: doc.text,
+          metadata: doc.metadata,
+          score: doc.score
+        }))
+      };
+
       setTimeout(() => {
-        setResponse(res.data);
+        setResponse(finalResult);
         setLoading(false);
-      }, 600);
+      }, 500);
 
     } catch (error) {
       if (progressTimer) clearInterval(progressTimer);
       console.error(error);
-      alert("Bir hata oluştu veya zaman aşımı.");
+      alert("Bir hata oluştu. Lütfen tekrar deneyin.");
       setLoading(false);
     }
   };

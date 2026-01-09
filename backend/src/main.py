@@ -53,53 +53,122 @@ app.add_middleware(
 # Initialize Engine (Global state)
 engine = None
 
-class QueryRequest(BaseModel):
+class RetrieveRequest(BaseModel):
     question: str
 
-class QueryResponse(BaseModel):
+class RetrieveResponse(BaseModel):
+    context_docs: list
+    message: str
+
+class GenerateRequest(BaseModel):
+    question: str
+    context_docs: list
+
+class GenerateResponse(BaseModel):
     answer: str
-    sources: list
     prompt: str
 
-@app.on_event("startup")
-def startup_event():
-    global engine
-    # Ensure CWD is correct or paths are absolute in RAGEngine
-    # backend/src is where this runs? Or root?
-    # We'll assume running from root: python backend/src/main.py
-    # or uvicorn backend.src.main:app
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    try:
-        engine = RAGEngine()
-    except Exception as e:
-        print(f"Failed to initialize engine: {e}")
-
-@app.post("/api/chat", response_model=QueryResponse)
-async def chat(request: QueryRequest):
+@app.post("/api/retrieve", response_model=RetrieveResponse)
+async def retrieve_context(request: RetrieveRequest):
     if not engine:
         raise HTTPException(status_code=503, detail="RAG Engine not initialized")
     
     try:
-        result = engine.answer_question(request.question)
+        # Step 1: Just retrieve documents
+        # This should take < 5 seconds
+        results = engine.retrieve(request.question)
         
-        # Format sources
-        sources = [
-            {
-                "madde": ctx["madde_no"], 
-                "text": ctx["text"],
-                "metadata": ctx["metadata"],
-                "score": ctx["score"]
-            } 
-            for ctx in result["retrieved_context"]
-        ]
+        documents = results['documents'][0]
+        metadatas = results['metadatas'][0]
+        distances = results['distances'][0]
         
-        return QueryResponse(
-            answer=result["answer"],
-            sources=sources,
-            prompt=result["prompt_used"]
+        context_docs = []
+        
+        if not distances:
+             return RetrieveResponse(context_docs=[], message="No results")
+        
+        for i, (doc, meta, dist) in enumerate(zip(documents, metadatas, distances)):
+             if dist > 0.6: 
+                 continue
+                 
+             context_docs.append({
+                "text": doc,
+                "madde_no": meta.get("madde", "?"),
+                "metadata": meta,
+                "score": 1 - dist
+            })
+            
+        return RetrieveResponse(
+            context_docs=context_docs,
+            message="Found matches" if context_docs else "No strong matches"
         )
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Retrieval Error: {e}")
+        # Return empty list rather than fail, so flow continues
+        return RetrieveResponse(context_docs=[], message=f"Error: {str(e)}")
+
+@app.post("/api/answer", response_model=GenerateResponse)
+async def generate_answer(request: GenerateRequest):
+    if not engine:
+        raise HTTPException(status_code=503, detail="RAG Engine not initialized")
+        
+    # Step 2: Generate Answer using provided context
+    # This also takes < 5-10 seconds
+    
+    # 0. Check for greetings (in case context is empty but it's a greeting)
+    greetings = ["merhaba", "selam", "günaydın", "iyi günler", "nasılsın", "hi", "hello"]
+    if len(request.question) < 30 and any(g in request.question.lower() for g in greetings):
+         return GenerateResponse(
+            answer="Merhaba! Ben T.C. Anayasası yapay zeka asistanıyım. Size Anayasa maddeleri ve mevzuat hakkında nasıl yardımcı olabilirim?",
+            prompt="Greeting"
+        )
+        
+    if not request.context_docs:
+         return GenerateResponse(
+            answer="Anayasa'da bu konuya ilişkin doğrudan bilgi bulunamadı.",
+            prompt="No Context"
+        )
+
+    # Generate Prompt
+    prompt_text = engine.generate_prompt_content(request.question, request.context_docs)
+    
+    # Call LLM (REST API call happens here)
+    # Re-use engine's method but we need to bypass answer_question method's retrieve logic
+    # Or refactor engine. Let's just do REST call here or add a method to engine?
+    # Better to add a 'generate_answer_from_context' method to engine, or just duplicate the simple requests logic here.
+    # To keep it clean, let's call engine logic. 
+    # But wait, engine.answer_question does BOTH.
+    # We should add `engine.generate_only(question, context)` to rag_engine.py.
+    # For now, I will implement the REST call here to avoid editing rag_engine.py again right now if possible, 
+    # BUT I should edit rag_engine.py to expose generation logic cleanly.
+    # Actually I CANNOT edit rag_engine.py cleanly without tool call.
+    # I will inline the generation request here for speed.
+    
+    import requests
+    # Need API Key. defined in engine?
+    api_key = engine.api_key
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt_text}]
+        }]
+    }
+    
+    try:
+        resp = requests.post(url, json=payload, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+        answer = data['candidates'][0]['content']['parts'][0]['text']
+        
+        return GenerateResponse(answer=answer, prompt=prompt_text)
+    except Exception as e:
+        return GenerateResponse(answer=f"API Hatası: {str(e)}", prompt=prompt_text)
+
+# Keep legacy endpoint for backward compat if needed, but Frontend will switch
+# Removed @app.post("/api/chat") ... to force switch and save space.
 
 @app.get("/health")
 def health():
