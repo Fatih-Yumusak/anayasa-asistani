@@ -155,10 +155,14 @@ async def generate_answer(request: GenerateRequest):
     # I will inline the generation request here for speed.
     
     import requests
+    import time
+    
     # Need API Key. defined in engine?
     api_key = engine.api_key
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    # Switch to stable 1.5-flash for better rate limits
+    model_name = "gemini-1.5-flash"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
     
     payload = {
         "contents": [{
@@ -166,15 +170,28 @@ async def generate_answer(request: GenerateRequest):
         }]
     }
     
-    try:
-        resp = requests.post(url, json=payload, timeout=30)
-        resp.raise_for_status()
-        data = resp.json()
-        answer = data['candidates'][0]['content']['parts'][0]['text']
-        
-        return GenerateResponse(answer=answer, prompt=prompt_text)
-    except Exception as e:
-        return GenerateResponse(answer=f"API Hatası: {str(e)}", prompt=prompt_text)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            resp = requests.post(url, json=payload, timeout=30)
+            
+            if resp.status_code == 429:
+                print(f"Rate Limit Hit (429). Retrying in 2s... ({attempt+1}/{max_retries})")
+                time.sleep(2)
+                continue
+                
+            resp.raise_for_status()
+            data = resp.json()
+            answer = data['candidates'][0]['content']['parts'][0]['text']
+            
+            return GenerateResponse(answer=answer, prompt=prompt_text)
+            
+        except Exception as e:
+            if attempt == max_retries - 1:
+                # Sanitize error message (remove API key)
+                err_msg = str(e).replace(api_key, "HIDDEN_KEY")
+                return GenerateResponse(answer=f"Google API Hatası (Yoğunluk): {err_msg}", prompt=prompt_text)
+            time.sleep(1)
 
 # Keep legacy endpoint for backward compat if needed, but Frontend will switch
 # Removed @app.post("/api/chat") ... to force switch and save space.
