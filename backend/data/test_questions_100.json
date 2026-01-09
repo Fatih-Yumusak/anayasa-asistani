@@ -1,0 +1,602 @@
+[
+  {
+    "id": 1,
+    "question": "Devletin şekli nedir?",
+    "target_madde": 1,
+    "target_konu": "Devletin şekli"
+  },
+  {
+    "id": 2,
+    "question": "Cumhuriyetin nitelikleri nedir?",
+    "target_madde": 2,
+    "target_konu": "Cumhuriyetin nitelikleri"
+  },
+  {
+    "id": 3,
+    "question": "Devletin bütünlüğü, Resmî dili, bayrağı, milli marşı ve başkenti nedir?",
+    "target_madde": 3,
+    "target_konu": "Devletin bütünlüğü, Resmî dili, bayrağı, milli marşı ve başkenti"
+  },
+  {
+    "id": 4,
+    "question": "Değiştirilemeyecek hükümler nedir?",
+    "target_madde": 4,
+    "target_konu": "Değiştirilemeyecek hükümler"
+  },
+  {
+    "id": 5,
+    "question": "Devletin temel amaç ve  görevleri nelerdir?",
+    "target_madde": 5,
+    "target_konu": "Devletin temel amaç ve görevleri"
+  },
+  {
+    "id": 6,
+    "question": "Egemenlik nedir?",
+    "target_madde": 6,
+    "target_konu": "Egemenlik"
+  },
+  {
+    "id": 7,
+    "question": "Yasama yetkisi nedir?",
+    "target_madde": 7,
+    "target_konu": "Yasama yetkisi"
+  },
+  {
+    "id": 8,
+    "question": "Yürütme yetkisi ve görevi nedir?",
+    "target_madde": 8,
+    "target_konu": "Yürütme yetkisi ve görevi"
+  },
+  {
+    "id": 9,
+    "question": "Yargı yetkisi nedir?",
+    "target_madde": 9,
+    "target_konu": "Yargı yetkisi"
+  },
+  {
+    "id": 10,
+    "question": "Kanun önünde eşitlik nedir?",
+    "target_madde": 10,
+    "target_konu": "Kanun önünde eşitlik"
+  },
+  {
+    "id": 11,
+    "question": "Anayasanın bağlayıcılığı ve üstünlüğü nedir?",
+    "target_madde": 11,
+    "target_konu": "Anayasanın bağlayıcılığı ve üstünlüğü"
+  },
+  {
+    "id": 12,
+    "question": "Temel hak ve hürriyetlerin niteliği nedir?",
+    "target_madde": 12,
+    "target_konu": "Temel hak ve hürriyetlerin niteliği"
+  },
+  {
+    "id": 13,
+    "question": "Temel hak ve hürriyetlerin sınırlanması nedir?",
+    "target_madde": 13,
+    "target_konu": "Temel hak ve hürriyetlerin sınırlanması"
+  },
+  {
+    "id": 14,
+    "question": "Temel hak ve hürriyetlerin kötüye kullanılamaması nedir?",
+    "target_madde": 14,
+    "target_konu": "Temel hak ve hürriyetlerin kötüye kullanılamaması"
+  },
+  {
+    "id": 15,
+    "question": "Temel hak ve hürriyetlerin kullanılmasının durdurulması nedir?",
+    "target_madde": 15,
+    "target_konu": "Temel hak ve hürriyetlerin kullanılmasının durdurulması"
+  },
+  {
+    "id": 16,
+    "question": "Yabancıların durumu nedir?",
+    "target_madde": 16,
+    "target_konu": "Yabancıların durumu"
+  },
+  {
+    "id": 17,
+    "question": "Kişinin dokunulmazlığı, maddi ve manevi varlığı nedir?",
+    "target_madde": 17,
+    "target_konu": "Kişinin dokunulmazlığı, maddi ve manevi varlığı"
+  },
+  {
+    "id": 18,
+    "question": "Zorla çalıştırma yasağı nedir?",
+    "target_madde": 18,
+    "target_konu": "Zorla çalıştırma yasağı"
+  },
+  {
+    "id": 19,
+    "question": "Kişi hürriyeti ve güvenliği anayasada nasıl tanımlanmıştır?",
+    "target_madde": 19,
+    "target_konu": "Kişi hürriyeti ve güvenliği"
+  },
+  {
+    "id": 20,
+    "question": "Özel hayatın gizliliği ve korunması nedir?",
+    "target_madde": 20,
+    "target_konu": "Özel hayatın gizliliği ve korunması"
+  },
+  {
+    "id": 21,
+    "question": "Özel hayatın gizliliği ve korunması nedir?",
+    "target_madde": 21,
+    "target_konu": "Özel hayatın gizliliği ve korunması"
+  },
+  {
+    "id": 22,
+    "question": "Özel hayatın gizliliği ve korunması nedir?",
+    "target_madde": 22,
+    "target_konu": "Özel hayatın gizliliği ve korunması"
+  },
+  {
+    "id": 23,
+    "question": "Yerleşme ve seyahat hürriyeti anayasada nasıl tanımlanmıştır?",
+    "target_madde": 23,
+    "target_konu": "Yerleşme ve seyahat hürriyeti"
+  },
+  {
+    "id": 24,
+    "question": "Din ve vicdan hürriyeti anayasada nasıl tanımlanmıştır?",
+    "target_madde": 24,
+    "target_konu": "Din ve vicdan hürriyeti"
+  },
+  {
+    "id": 25,
+    "question": "Düşünce ve kanaat hürriyeti anayasada nasıl tanımlanmıştır?",
+    "target_madde": 25,
+    "target_konu": "Düşünce ve kanaat hürriyeti"
+  },
+  {
+    "id": 26,
+    "question": "Düşünceyi açıklama ve yayma hürriyeti anayasada nasıl tanımlanmıştır?",
+    "target_madde": 26,
+    "target_konu": "Düşünceyi açıklama ve yayma hürriyeti"
+  },
+  {
+    "id": 27,
+    "question": "Bilim ve sanat hürriyeti anayasada nasıl tanımlanmıştır?",
+    "target_madde": 27,
+    "target_konu": "Bilim ve sanat hürriyeti"
+  },
+  {
+    "id": 28,
+    "question": "Basın ve yayımla ilgili hükümler nedir?",
+    "target_madde": 28,
+    "target_konu": "Basın ve yayımla ilgili hükümler"
+  },
+  {
+    "id": 29,
+    "question": "Basın ve yayımla ilgili hükümler nedir?",
+    "target_madde": 29,
+    "target_konu": "Basın ve yayımla ilgili hükümler"
+  },
+  {
+    "id": 30,
+    "question": "Basın ve yayımla ilgili hükümler nedir?",
+    "target_madde": 30,
+    "target_konu": "Basın ve yayımla ilgili hükümler"
+  },
+  {
+    "id": 31,
+    "question": "Basın ve yayımla ilgili hükümler nedir?",
+    "target_madde": 31,
+    "target_konu": "Basın ve yayımla ilgili hükümler"
+  },
+  {
+    "id": 32,
+    "question": "Basın ve yayımla ilgili hükümler nedir?",
+    "target_madde": 32,
+    "target_konu": "Basın ve yayımla ilgili hükümler"
+  },
+  {
+    "id": 33,
+    "question": "Toplantı hak ve hürriyetleri nedir?",
+    "target_madde": 33,
+    "target_konu": "Toplantı hak ve hürriyetleri"
+  },
+  {
+    "id": 34,
+    "question": "Toplantı hak ve hürriyetleri nedir?",
+    "target_madde": 34,
+    "target_konu": "Toplantı hak ve hürriyetleri"
+  },
+  {
+    "id": 35,
+    "question": "Mülkiyet hakkı anayasada nasıl tanımlanmıştır?",
+    "target_madde": 35,
+    "target_konu": "Mülkiyet hakkı"
+  },
+  {
+    "id": 36,
+    "question": "Hakların korunması ile ilgili hükümler nedir?",
+    "target_madde": 36,
+    "target_konu": "Hakların korunması ile ilgili hükümler"
+  },
+  {
+    "id": 37,
+    "question": "Hakların korunması ile ilgili hükümler nedir?",
+    "target_madde": 37,
+    "target_konu": "Hakların korunması ile ilgili hükümler"
+  },
+  {
+    "id": 38,
+    "question": "Hakların korunması ile ilgili hükümler nedir?",
+    "target_madde": 38,
+    "target_konu": "Hakların korunması ile ilgili hükümler"
+  },
+  {
+    "id": 39,
+    "question": "İspat hakkı anayasada nasıl tanımlanmıştır?",
+    "target_madde": 39,
+    "target_konu": "İspat hakkı"
+  },
+  {
+    "id": 40,
+    "question": "Temel hak ve hürriyetlerin korunması nedir?",
+    "target_madde": 40,
+    "target_konu": "Temel hak ve hürriyetlerin korunması"
+  },
+  {
+    "id": 41,
+    "question": "Ailenin korunması ve çocuk hakları17 nedir?",
+    "target_madde": 41,
+    "target_konu": "Ailenin korunması ve çocuk hakları17"
+  },
+  {
+    "id": 42,
+    "question": "Eğitim ve öğrenim hakkı ve ödevi anayasada nasıl tanımlanmıştır?",
+    "target_madde": 42,
+    "target_konu": "Eğitim ve öğrenim hakkı ve ödevi"
+  },
+  {
+    "id": 43,
+    "question": "Kamu yararı nedir?",
+    "target_madde": 43,
+    "target_konu": "Kamu yararı"
+  },
+  {
+    "id": 44,
+    "question": "Kamu yararı nedir?",
+    "target_madde": 44,
+    "target_konu": "Kamu yararı"
+  },
+  {
+    "id": 45,
+    "question": "Kamu yararı nedir?",
+    "target_madde": 45,
+    "target_konu": "Kamu yararı"
+  },
+  {
+    "id": 46,
+    "question": "Kamu yararı nedir?",
+    "target_madde": 46,
+    "target_konu": "Kamu yararı"
+  },
+  {
+    "id": 47,
+    "question": "Kamu yararı nedir?",
+    "target_madde": 47,
+    "target_konu": "Kamu yararı"
+  },
+  {
+    "id": 48,
+    "question": "Çalışma ve sözleşme hürriyeti anayasada nasıl tanımlanmıştır?",
+    "target_madde": 48,
+    "target_konu": "Çalışma ve sözleşme hürriyeti"
+  },
+  {
+    "id": 49,
+    "question": "Çalışma ile ilgili hükümler nedir?",
+    "target_madde": 49,
+    "target_konu": "Çalışma ile ilgili hükümler"
+  },
+  {
+    "id": 50,
+    "question": "Çalışma ile ilgili hükümler nedir?",
+    "target_madde": 50,
+    "target_konu": "Çalışma ile ilgili hükümler"
+  },
+  {
+    "id": 51,
+    "question": "Çalışma ile ilgili hükümler nedir?",
+    "target_madde": 51,
+    "target_konu": "Çalışma ile ilgili hükümler"
+  },
+  {
+    "id": 52,
+    "question": "Çalışma ile ilgili hükümler nedir?",
+    "target_madde": 52,
+    "target_konu": "Çalışma ile ilgili hükümler"
+  },
+  {
+    "id": 53,
+    "question": "Toplu iş sözleşmesi, grev hakkı ve lokavt anayasada nasıl tanımlanmıştır?",
+    "target_madde": 53,
+    "target_konu": "Toplu iş sözleşmesi, grev hakkı ve lokavt"
+  },
+  {
+    "id": 54,
+    "question": "Toplu iş sözleşmesi, grev hakkı ve lokavt anayasada nasıl tanımlanmıştır?",
+    "target_madde": 54,
+    "target_konu": "Toplu iş sözleşmesi, grev hakkı ve lokavt"
+  },
+  {
+    "id": 55,
+    "question": "Ücrette adalet sağlanması nedir?",
+    "target_madde": 55,
+    "target_konu": "Ücrette adalet sağlanması"
+  },
+  {
+    "id": 56,
+    "question": "Sağlık, çevre ve konut nedir?",
+    "target_madde": 56,
+    "target_konu": "Sağlık, çevre ve konut"
+  },
+  {
+    "id": 57,
+    "question": "Sağlık, çevre ve konut nedir?",
+    "target_madde": 57,
+    "target_konu": "Sağlık, çevre ve konut"
+  },
+  {
+    "id": 58,
+    "question": "Gençlik ve spor nedir?",
+    "target_madde": 58,
+    "target_konu": "Gençlik ve spor"
+  },
+  {
+    "id": 59,
+    "question": "Gençlik ve spor nedir?",
+    "target_madde": 59,
+    "target_konu": "Gençlik ve spor"
+  },
+  {
+    "id": 60,
+    "question": "Sosyal güvenlik hakları nedir?",
+    "target_madde": 60,
+    "target_konu": "Sosyal güvenlik hakları"
+  },
+  {
+    "id": 61,
+    "question": "Sosyal güvenlik hakları nedir?",
+    "target_madde": 61,
+    "target_konu": "Sosyal güvenlik hakları"
+  },
+  {
+    "id": 62,
+    "question": "Sosyal güvenlik hakları nedir?",
+    "target_madde": 62,
+    "target_konu": "Sosyal güvenlik hakları"
+  },
+  {
+    "id": 63,
+    "question": "Tarih, kültür ve tabiat varlıklarının korunması nedir?",
+    "target_madde": 63,
+    "target_konu": "Tarih, kültür ve tabiat varlıklarının korunması"
+  },
+  {
+    "id": 64,
+    "question": "Sanatın ve sanatçının korunması nedir?",
+    "target_madde": 64,
+    "target_konu": "Sanatın ve sanatçının korunması"
+  },
+  {
+    "id": 65,
+    "question": "Devletin iktisadi ve sosyal ödevlerinin sınırları 22 nedir?",
+    "target_madde": 65,
+    "target_konu": "Devletin iktisadi ve sosyal ödevlerinin sınırları 22"
+  },
+  {
+    "id": 66,
+    "question": "Türk vatandaşlığı nedir?",
+    "target_madde": 66,
+    "target_konu": "Türk vatandaşlığı"
+  },
+  {
+    "id": 67,
+    "question": "Seçme, seçilme ve siyasi faaliyette bulunma hakları nedir?",
+    "target_madde": 67,
+    "target_konu": "Seçme, seçilme ve siyasi faaliyette bulunma hakları"
+  },
+  {
+    "id": 68,
+    "question": "Siyasi partilerle ilgili hükümler nedir?",
+    "target_madde": 68,
+    "target_konu": "Siyasi partilerle ilgili hükümler"
+  },
+  {
+    "id": 69,
+    "question": "Siyasi partilerle ilgili hükümler nedir?",
+    "target_madde": 69,
+    "target_konu": "Siyasi partilerle ilgili hükümler"
+  },
+  {
+    "id": 70,
+    "question": "Kamu hizmetlerine girme hakkı anayasada nasıl tanımlanmıştır?",
+    "target_madde": 70,
+    "target_konu": "Kamu hizmetlerine girme hakkı"
+  },
+  {
+    "id": 71,
+    "question": "Kamu hizmetlerine girme hakkı anayasada nasıl tanımlanmıştır?",
+    "target_madde": 71,
+    "target_konu": "Kamu hizmetlerine girme hakkı"
+  },
+  {
+    "id": 72,
+    "question": "Vatan hizmeti nedir?",
+    "target_madde": 72,
+    "target_konu": "Vatan hizmeti"
+  },
+  {
+    "id": 73,
+    "question": "Vergi ödevi nedir?",
+    "target_madde": 73,
+    "target_konu": "Vergi ödevi"
+  },
+  {
+    "id": 74,
+    "question": "Dilekçe, bilgi edinme ve kamu denetçisine başvurma hakkı 26 anayasada nasıl tanımlanmıştır?",
+    "target_madde": 74,
+    "target_konu": "Dilekçe, bilgi edinme ve kamu denetçisine başvurma hakkı 26"
+  },
+  {
+    "id": 75,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 75,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 76,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 76,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 77,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 77,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 78,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 78,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 79,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 79,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 80,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 80,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 81,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 81,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 82,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 82,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 83,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 83,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 84,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 84,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 85,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 85,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 86,
+    "question": "Türkiye Büyük Millet Meclisi nedir?",
+    "target_madde": 86,
+    "target_konu": "Türkiye Büyük Millet Meclisi"
+  },
+  {
+    "id": 87,
+    "question": "Türkiye Büyük Millet Meclisinin görev ve yetkileri nedir?",
+    "target_madde": 87,
+    "target_konu": "Türkiye Büyük Millet Meclisinin görev ve yetkileri"
+  },
+  {
+    "id": 88,
+    "question": "Türkiye Büyük Millet Meclisinin görev ve yetkileri nedir?",
+    "target_madde": 88,
+    "target_konu": "Türkiye Büyük Millet Meclisinin görev ve yetkileri"
+  },
+  {
+    "id": 89,
+    "question": "Türkiye Büyük Millet Meclisinin görev ve yetkileri nedir?",
+    "target_madde": 89,
+    "target_konu": "Türkiye Büyük Millet Meclisinin görev ve yetkileri"
+  },
+  {
+    "id": 90,
+    "question": "Türkiye Büyük Millet Meclisinin görev ve yetkileri nedir?",
+    "target_madde": 90,
+    "target_konu": "Türkiye Büyük Millet Meclisinin görev ve yetkileri"
+  },
+  {
+    "id": 91,
+    "question": "Türkiye Büyük Millet Meclisinin görev ve yetkileri nedir?",
+    "target_madde": 91,
+    "target_konu": "Türkiye Büyük Millet Meclisinin görev ve yetkileri"
+  },
+  {
+    "id": 92,
+    "question": "Türkiye Büyük Millet Meclisinin görev ve yetkileri nedir?",
+    "target_madde": 92,
+    "target_konu": "Türkiye Büyük Millet Meclisinin görev ve yetkileri"
+  },
+  {
+    "id": 93,
+    "question": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler nedir?",
+    "target_madde": 93,
+    "target_konu": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler"
+  },
+  {
+    "id": 94,
+    "question": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler nedir?",
+    "target_madde": 94,
+    "target_konu": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler"
+  },
+  {
+    "id": 95,
+    "question": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler nedir?",
+    "target_madde": 95,
+    "target_konu": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler"
+  },
+  {
+    "id": 96,
+    "question": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler nedir?",
+    "target_madde": 96,
+    "target_konu": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler"
+  },
+  {
+    "id": 97,
+    "question": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler nedir?",
+    "target_madde": 97,
+    "target_konu": "Türkiye Büyük Millet Meclisinin faaliyetleri ile ilgili hükümler"
+  },
+  {
+    "id": 98,
+    "question": "Türkiye Büyük Millet Meclisinin bilgi edinme ve denetim yolları nedir?",
+    "target_madde": 98,
+    "target_konu": "Türkiye Büyük Millet Meclisinin bilgi edinme ve denetim yolları"
+  },
+  {
+    "id": 99,
+    "question": "Türkiye Büyük Millet Meclisinin bilgi edinme ve denetim yolları nedir?",
+    "target_madde": 99,
+    "target_konu": "Türkiye Büyük Millet Meclisinin bilgi edinme ve denetim yolları"
+  },
+  {
+    "id": 100,
+    "question": "Türkiye Büyük Millet Meclisinin bilgi edinme ve denetim yolları nedir?",
+    "target_madde": 100,
+    "target_konu": "Türkiye Büyük Millet Meclisinin bilgi edinme ve denetim yolları"
+  }
+]

@@ -1,0 +1,329 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Search, Mic, Upload, ArrowUp, Box, Book, Clock } from "lucide-react";
+
+export default function Home() {
+  const [query, setQuery] = useState("");
+  const [response, setResponse] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Progress State
+  const [progress, setProgress] = useState(0);
+  const [stage, setStage] = useState(""); // "Veritabanı taranıyor", "Cevap üretiliyor"
+
+  // PDF Modal State
+  const [readerState, setReaderState] = useState<{ targetId: string, source: string } | null>(null);
+
+  // Environment aware API URL
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    setResponse(null);
+    setProgress(0);
+    setStage("Başlatılıyor...");
+
+    // Simulation Timer
+    let progressTimer: NodeJS.Timeout | undefined;
+
+    try {
+      // 1. Retrieval Phase Simulation (Fast)
+      setStage("Anayasa maddeleri taranıyor...");
+      setProgress(10);
+
+      progressTimer = setInterval(() => {
+        setProgress((prev) => {
+          // Slow down as we get closer to 90%
+          if (prev < 30) return prev + 5;
+          if (prev < 60) {
+            setStage("İlgili maddeler bulundu. Cevap üretiliyor (1.5B Model)...");
+            return prev + 2;
+          }
+          if (prev < 90) return prev + 0.5; // Very slow crawl for generation
+          return prev;
+        });
+      }, 500);
+
+      const res = await axios.post(`${API_BASE}/api/chat`, { question: query });
+
+      // Done
+      if (progressTimer) clearInterval(progressTimer);
+      setProgress(100);
+      setStage("Tamamlandı.");
+
+      // Small delay to show 100% before showing result
+      setTimeout(() => {
+        setResponse(res.data);
+        setLoading(false);
+      }, 600);
+
+    } catch (error) {
+      if (progressTimer) clearInterval(progressTimer);
+      console.error(error);
+      alert("Bir hata oluştu veya zaman aşımı.");
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch();
+  };
+
+
+  return (
+    // Main container handled by Layout, just specific page styling here if needed
+    <div className="flex-grow flex flex-col font-sans text-gray-800">
+
+      {/* Main Content */}
+      <main className="flex-grow flex flex-col items-center justify-center p-6 relative">
+
+        {/* Intro Text */}
+        {!response && !loading && (
+          <h1 className="text-2xl md:text-3xl text-gray-700 mb-8 text-center">
+            Türk Anayasası mevzuatına yapay zeka desteğiyle erişin.
+          </h1>
+        )}
+
+        {/* Search Bar */}
+        <div className={`w-full max-w-2xl bg-[#EBEBEB] rounded-2xl shadow-lg p-2 transition-all duration-500 ${response || loading ? 'mt-0' : 'mb-12'}`}>
+          <div className="flex flex-col relative">
+            <textarea
+              className="w-full bg-transparent p-4 min-h-[60px] outline-none text-gray-700 placeholder-gray-500 resize-none"
+              placeholder="Sorunuzu sorun..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+            />
+            <div className="flex justify-end items-center px-2 pb-2">
+              <button
+                onClick={handleSearch}
+                disabled={loading}
+                className={`p-2 rounded-full transition ${query ? 'bg-black text-white' : 'bg-gray-300 text-gray-500'}`}
+              >
+                <ArrowUp size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading State - Deterministic Progress Bar */}
+        {loading && (
+          <div className="w-full max-w-2xl mt-8 px-2 fade-in">
+            <div className="flex justify-between text-xs text-gray-600 mb-2 font-medium">
+              <span>{stage}</span>
+              <span>%{Math.round(progress)}</span>
+            </div>
+
+            <div className="h-2 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+
+            <p className="text-center text-[10px] text-gray-400 mt-2">
+              Qwen2.5-1.5B modeli disk üzerinden çalıştığı için yanıt süresi uzun sürebilir.
+            </p>
+          </div>
+        )}
+
+        {/* Results Area */}
+        {response && (
+          <div className="w-full max-w-4xl bg-white rounded-xl shadow-xl p-8 mt-8 fade-in">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Yanıt</h2>
+            <div className="prose max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
+              {response.answer}
+            </div>
+
+            {response.sources && response.sources.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                  <Book size={20} className="mr-2 text-red-600" /> Kaynak Maddeler
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {response.sources.map((src: any, idx: number) => {
+                    // Determine Source Name safely
+                    const sourceName = src.metadata?.source || "Anayasa";
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => {
+                          // Set Target ID and Source for Reader
+                          // For TIHEK, IDs are like "TIHEK Kanunu MADDE 3"
+                          // For Anayasa, IDs are like "MADDE 3"
+                          // We pass exact source to filter the reader
+                          const targetId = sourceName === "Anayasa" ? `MADDE ${src.madde}` : `${sourceName} MADDE ${src.madde}`;
+                          setReaderState({ targetId, source: sourceName });
+                        }}
+                        className="cursor-pointer block bg-gray-50 border-l-4 border-red-500 p-4 rounded text-sm hover:shadow-md transition hover:bg-red-50 group"
+                      >
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-bold text-red-700 group-hover:text-red-900">
+                            {/* Display user friendly name */}
+                            {sourceName === "Anayasa" ? `MADDE ${src.madde}` : `${sourceName} Md. ${src.madde}`}
+                          </span>
+                          <span className="text-xs text-gray-400 font-mono border px-1 rounded flex items-center gap-1">
+                            <Book size={10} /> Sayfa {src.metadata?.page || "?"} (Oku)
+                          </span>
+                        </div>
+                        {/* Show Source Badge if not Anayasa */}
+                        {sourceName !== "Anayasa" && (
+                          <span className="inline-block bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full mb-2 font-semibold">
+                            {sourceName}
+                          </span>
+                        )}
+                        <p className="line-clamp-4 text-gray-600">{src.text}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Feature Cards */}
+        {!response && !loading && (
+          <div className="grid md:grid-cols-3 gap-6 w-full max-w-5xl px-4 mt-8">
+            <FeatureCard
+              icon={<Box size={24} className="text-white" />}
+              title="Yapay Zeka Destekli"
+              desc="Modern AI teknolojisiyle hızlı ve doğru sonuçlar"
+            />
+            <FeatureCard
+              icon={<Book size={24} className="text-white" />}
+              title="Kapsamlı Mevzuat"
+              desc="Anayasa belgelerinin tamamı"
+              color="bg-yellow-500"
+            />
+            <FeatureCard
+              icon={<Clock size={24} className="text-white" />}
+              title="Anında Erişim"
+              desc="İhtiyacınız olan bilgiye saniyeler içinde ulaşın"
+              color="bg-red-600"
+            />
+          </div>
+        )}
+
+      </main>
+
+
+      {/* Legislation Reader Modal */}
+      {readerState && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 fade-in">
+          <div className="bg-white w-full h-full max-w-5xl rounded-xl shadow-2xl flex flex-col overflow-hidden relative">
+            {/* Header */}
+            <div className="bg-gray-100 p-4 border-b flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center space-x-2">
+                <Book size={20} className="text-red-600" />
+                <span className="font-bold text-gray-700">
+                  {readerState.source} - Mevzuat Okuyucu
+                </span>
+              </div>
+              <button
+                onClick={() => setReaderState(null)}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-full transition font-medium"
+              >
+                ✕ Kapat
+              </button>
+            </div>
+
+            {/* Reader Content */}
+            <LegislationReader targetId={readerState.targetId} source={readerState.source} />
+
+            {/* Tip */}
+            <div className="bg-yellow-50 text-yellow-800 text-xs p-2 text-center border-t">
+              İlgili madde otomatik olarak vurgulanmıştır.
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LegislationReader({ targetId, source }: { targetId: string, source: string }) {
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  useEffect(() => {
+    // Fetch filtered text
+    setLoading(true);
+    axios.get(`${API_BASE}/api/legislation`, { params: { source } })
+      .then(res => {
+        setArticles(res.data.articles);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load legislation", err);
+        setLoading(false);
+      });
+  }, [source]); // Re-fetch when source changes
+
+  // Auto-Scroll Effect
+  useEffect(() => {
+    if (!loading && targetId && articles.length > 0) {
+      // Small delay to ensure rendering
+      setTimeout(() => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  }, [loading, targetId, articles]);
+
+  if (loading) return <div className="flex-1 flex items-center justify-center">Yükleniyor...</div>;
+
+  return (
+    <div className="flex-1 overflow-y-auto p-8 bg-white space-y-8">
+      {articles.length === 0 && (
+        <div className="text-center text-gray-500">Bu belge için içerik bulunamadı.</div>
+      )}
+      {articles.map((article: any) => {
+        const isTarget = article.id === targetId;
+        // Parse Text: Remove "KONU: ..." line if present to make it cleaner
+        const cleanText = article.text.replace(/^KONU:.*\n/, "");
+
+        return (
+          <div
+            key={article.id}
+            id={article.id} // use unique ID (includes source if needed)
+            className={`p-6 rounded-lg transition-all duration-1000 ${isTarget ? 'bg-yellow-100 ring-4 ring-yellow-400 shadow-xl scale-[1.02]' : 'hover:bg-gray-50'}`}
+          >
+            <div className="flex items-baseline space-x-3 mb-2">
+              <span className={`font-bold text-lg ${isTarget ? 'text-red-700' : 'text-gray-800'}`}>
+                {/* Display Number cleanly */}
+                MADDE {article.madde_no}
+              </span>
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+                {article.metadata.konu}
+              </span>
+            </div>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-justify border-l-4 border-gray-200 pl-4">
+              {cleanText}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function FeatureCard({ icon, title, desc, color = "bg-red-600" }: { icon: any, title: string, desc: string, color?: string }) {
+  return (
+    <div className="bg-[#EBEBEB] p-6 rounded-xl flex flex-col items-center text-center shadow-sm hover:shadow-md transition">
+      <div className={`p-4 rounded-xl mb-4 ${color}`}>
+        {icon}
+      </div>
+      <h3 className="font-bold text-gray-800 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm">{desc}</p>
+    </div>
+  )
+}

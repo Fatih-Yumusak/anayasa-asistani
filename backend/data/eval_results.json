@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "question": "Devletin şekli nedir?",
+    "target_madde": 1,
+    "retrieved_maddes": [
+      1
+    ],
+    "is_hit": true,
+    "answer_text": "Türkiye Cumhuriyeti'dir."
+  },
+  {
+    "id": 2,
+    "question": "Cumhuriyetin nitelikleri nedir?",
+    "target_madde": 2,
+    "retrieved_maddes": [
+      2
+    ],
+    "is_hit": true,
+    "answer_text": "Cumhuriyetin nitelikleri şöyledir:\n\n- Toplumun huzuru,\n- Milli dayanışma,\n- Adalet anlayışı içinde,\n- İnsan haklarına saygılı,\n- Atatürk milliyetçiliğiyle bağlıdır,\n- Başlangıçta belirtilen temel ilkelere dayandırılır,\n- Demokratik,\n- Laik,\n- Sosyal bir hukuk."
+  },
+  {
+    "id": 3,
+    "question": "Devletin bütünlüğü, Resmî dili, bayrağı, milli marşı ve başkenti nedir?",
+    "target_madde": 3,
+    "retrieved_maddes": [
+      3
+    ],
+    "is_hit": true,
+    "answer_text": "**Cevap:**  \nTürkiye devleti, ülkesi ve milletiyle bölünmez bir bütündür. Dili Türkçedir. Bayrağı, şekli kanununda belirtilen, beyaz ay yıldızlı albayraktır. Milli marşı \"İstiklal Marşı\"dır. Başkenti Ankara'dır."
+  },
+  {
+    "id": 4,
+    "question": "Değiştirilemeyecek hükümler nedir?",
+    "target_madde": 4,
+    "retrieved_maddes": [
+      4
+    ],
+    "is_hit": true,
+    "answer_text": "Değiştirilemeyecek hükümler, aşağıdaki tür hükümlere denk gelmektedir:\n\n- **Madde 4**: Bu hükümler, Devletin şeklinin Cumhuriyet olduğunu belirtiren hüküm ile ilgili olan hükümlerdir.\n\nBu hükümler, Cumhuriyet'in niteliğini ve hangi özelliklere sahip olduğuna dair yasal kontrol altında tutulmamakta ve bu durum değişiklik yapma veya teklifi kabul etme olanağı yoktur."
+  },
+  {
+    "id": 5,
+    "question": "Devletin temel amaç ve  görevleri nelerdir?",
+    "target_madde": 5,
+    "retrieved_maddes": [
+      5
+    ],
+    "is_hit": true,
+    "answer_text": "Devletin temel amaç ve görevleri, Türk milletinin bağımsızlığını ve bütünlüğünü, ülkenin bölünmezliğini, Cumhuriyeti ve demokrasiyi korumaktadır. Ayrıca, kişisel hak ve hürriyetleri, sosyal hukuku ve adalet İlkelerine uygun olarak sınırlanmayacak şekilde siyasa, ekonomik ve sosyal engelleri kaldırarak, insanın maddi ve manevi varlıklarının gelişmesi için gereksiz şartlar hazırlamanıza çalışmaktadır."
+  },
+  {
+    "id": 6,
+    "question": "Egemenlik nedir?",
+    "target_madde": 6,
+    "retrieved_maddes": [
+      6
+    ],
+    "is_hit": true,
+    "answer_text": "Egemenliği, Türk Milleti tarafından yönetilen ve devletin kurumlarını temsil eden önemli bir yetkindir. Bu yetki, Anayasa'da belirlenen esaslar doğrultusunda kullanılmalıdır. Herkes, her zaman ve her yerde egemenciyeti kullanmamak için devlete bağlı olmalı ve devlet yetkilerini koruyup koruma hakkına sahip olmalıdır."
+  },
+  {
+    "id": 7,
+    "question": "Yasama yetkisi nedir?",
+    "target_madde": 7,
+    "retrieved_maddes": [
+      7
+    ],
+    "is_hit": true,
+    "answer_text": "Yasama yetkisi, Türk Milleti adına Türkiye Büyük Millet Meclisine ait olan haklar ve yetkilerdir. Bu yetki devredilemez."
+  },
+  {
+    "id": 8,
+    "question": "Yürütme yetkisi ve görevi nedir?",
+    "target_madde": 8,
+    "retrieved_maddes": [
+      8
+    ],
+    "is_hit": true,
+    "answer_text": "Yürütme yetkisi ve görevi, Cumhurbaşkanı tarafından, Anayasaya ve kanunlara uygun olarak kullanılır ve yerine getirilir."
+  },
+  {
+    "id": 9,
+    "question": "Yargı yetkisi nedir?",
+    "target_madde": 9,
+    "retrieved_maddes": [
+      9
+    ],
+    "is_hit": true,
+    "answer_text": "Yargı yetkisi, Türk Milleti adına bağımsız ve tarafsız mahkemelerce kullanılan hak ve görevdir."
+  },
+  {
+    "id": 10,
+    "question": "Kanun önünde eşitlik nedir?",
+    "target_madde": 10,
+    "retrieved_maddes": [
+      10
+    ],
+    "is_hit": true,
+    "answer_text": "Kanun önünde eşitlik, herkesin kanun önünde aynı şekilde davranması gerektiğini ifade eden bir kanunudur. Bu kanuna dayanan eşitlik, özellikle kadınların ve erkeklerin eşit haklarına olan saygı gösterimi anlamına gelir.\n\nEğer bir kişinin kanun önünde eşitliği ihmal ederse, bu durum kanun önünde eşitlik ilkesine aykırıdır. Bu durumu önlemek için devlet, kanun önünde eşitliğin yaşama geçirilmesini sağlamakla yükümlüdür. Ayrıca, çocuklara, yaşlılara, özürlere, harbeye, vazifeyi, şehitlerinin dul ve yetime ait tedbirler almak da eşitlik ilkesine aykırı olmayabilir.\n\nDevlet organları ve idari kurumlarda, her türlü işlemde kanun önünde eşitlik ilkesine uygun hareket etmelidir."
+  }
+]
