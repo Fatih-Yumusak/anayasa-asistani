@@ -52,6 +52,15 @@ app.add_middleware(
 
 # Initialize Engine (Global state)
 engine = None
+def get_engine():
+    global engine
+    if engine is None:
+        try:
+            engine = RAGEngine()
+        except Exception as e:
+            print(f"Engine Init Error: {e}")
+            raise HTTPException(status_code=500, detail=f"Engine Init Failed: {str(e)}")
+    return engine
 
 class RetrieveRequest(BaseModel):
     question: str
@@ -70,8 +79,7 @@ class GenerateResponse(BaseModel):
 
 @app.post("/api/retrieve", response_model=RetrieveResponse)
 async def retrieve_context(request: RetrieveRequest):
-    if not engine:
-        raise HTTPException(status_code=503, detail="RAG Engine not initialized")
+    engine = get_engine()
     
     try:
         # Step 1: Just retrieve documents
@@ -103,6 +111,8 @@ async def retrieve_context(request: RetrieveRequest):
             message="Found matches" if context_docs else "No strong matches"
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Retrieval Error: {e}")
         # Return empty list rather than fail, so flow continues
@@ -110,8 +120,7 @@ async def retrieve_context(request: RetrieveRequest):
 
 @app.post("/api/answer", response_model=GenerateResponse)
 async def generate_answer(request: GenerateRequest):
-    if not engine:
-        raise HTTPException(status_code=503, detail="RAG Engine not initialized")
+    engine = get_engine()
         
     # Step 2: Generate Answer using provided context
     # This also takes < 5-10 seconds
