@@ -1,6 +1,4 @@
 import json
-import numpy as np
-import google.generativeai as genai
 import os
 from typing import List, Dict, Any
 
@@ -9,17 +7,19 @@ class VectorStoreVercel:
         self.embeddings_path = embeddings_path
         self.documents = []
         self.vectors = None
-        
-        # Configure Gemini
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not found in env")
-        genai.configure(api_key=api_key)
         self.model_name = 'models/text-embedding-004'
-        
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        if not self.api_key:
+            raise ValueError("GEMINI_API_KEY not found in env")
+            
+        # Lazy load data only when needed (or we can load here if we want to fail fast)
+        # For Vercel, it's better to load fast.
         self._load_data()
 
     def _load_data(self):
+        # Local import to reduce cold start time
+        import numpy as np
+        
         if not os.path.exists(self.embeddings_path):
              print(f"Warning: {self.embeddings_path} not found. DB empty.")
              return
@@ -30,8 +30,15 @@ class VectorStoreVercel:
         self.documents = data
         # Convert list of lists to numpy array for fast calculation
         self.vectors = np.array([d['embedding'] for d in data])
+        print(f"Vector Store Loaded: {len(self.documents)} docs.")
         
     def query(self, query_text: str, n_results: int = 5):
+        # Local imports
+        import numpy as np
+        import google.generativeai as genai
+        
+        genai.configure(api_key=self.api_key)
+
         # 1. Embed Query
         # Task type retrieval_query specific for query side
         q_embed = genai.embed_content(

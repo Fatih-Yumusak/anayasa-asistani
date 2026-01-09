@@ -1,23 +1,27 @@
 from vector_store_vercel import VectorStoreVercel
-import google.generativeai as genai
 import os
 
 class RAGEngine:
-    def __init__(self, device: str = None): # device param kept for backward compatibility but unused
-        print("Initializing RAG Engine (Vercel/Gemini Mode)...")
-        self.vector_store = VectorStoreVercel()
-        
-        # Configure Gemini
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
+    def __init__(self, device: str = None):
+        print("Initializing RAG Engine (Lazy Mode)...")
+        self.vector_store = None
+        self.model = None
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        if not self.api_key:
             raise ValueError("GEMINI_API_KEY not found")
             
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
-        
-        print("Gemini LLM Loaded.")
-    
+    def _initialize_lazy(self):
+        if self.vector_store is None:
+            print("Lazy Loading: Vector Store & Gemini...")
+            import google.generativeai as genai
+            
+            self.vector_store = VectorStoreVercel()
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel('gemini-2.0-flash')
+            print("Lazy Loading Complete.")
+
     def retrieve(self, question: str, k: int = 5):
+        self._initialize_lazy()
         return self.vector_store.query(question, n_results=k)
 
     def generate_prompt_content(self, question: str, context_docs: list) -> str:
@@ -27,7 +31,6 @@ class RAGEngine:
             
         context_str = "\n\n".join([f"Madde {d['madde_no']} ({d['metadata'].get('konu', '')}):\n{d.get('text', '')}" for d in context_docs])
         
-        # Combined System + User Prompt (Gemini accepts single prompt or history)
         prompt = (f"""Sen T.C. Anayasası konusunda uzman, yardımsever bir hukuk asistanısın. Kullanıcının sorusunu verilen bağlama göre yanıtla.
 
 Kurallar:
@@ -44,7 +47,7 @@ Soru: {question}""")
         return prompt
         
     def answer_question(self, question: str):
-        # 0. Check for greetings
+        # 0. Check for greetings (No need to load engine for this!)
         greetings = ["merhaba", "selam", "günaydın", "iyi günler", "nasılsın", "hi", "hello"]
         if len(question) < 30 and any(g in question.lower() for g in greetings):
              return {
@@ -53,7 +56,7 @@ Soru: {question}""")
                 "prompt_used": "Greeting Check"
             }
 
-        # 1. Retrieve
+        # 1. Retrieve (Triggers lazy load)
         print(f"Retrieving for: {question}")
         results = self.retrieve(question)
         
@@ -69,23 +72,11 @@ Soru: {question}""")
                 "retrieved_context": [],
                 "prompt_used": "No Results"
             }
-
-        # Simplified Logic for Demo: Thresholding
-        # Note: 'distances' here are 1 - CosineSimilarity. Lower is better?
-        # In vector_store_vercel we returned (1 - similarity). So 0 means identical.
-        # Cosine Similarity: 1.0 (identical) -> Distance 0.0
-        # Cosine Similarity: 0.0 (orthogonal) -> Distance 1.0
         
         best_dist = distances[0]
         print(f"DEBUG: Best distance: {best_dist}")
         
-        # Adjust Thresholds for Gemini Embeddings (0.3 is usually a good similarity, so 0.7 distance)
-        # Wait, usually for E5: < 0.2 was strict.
-        # For Gemini text-embedding-004: distribution might be different.
-        # Let's keep it loose for safety first.
-        
         for i, (doc, meta, dist) in enumerate(zip(documents, metadatas, distances)):
-             # Filter very bad matches (Distance > 0.6 means Similarity < 0.4)
              if dist > 0.6: 
                  continue
                  
