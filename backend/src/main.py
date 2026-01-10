@@ -69,9 +69,12 @@ def get_coords():
     global coords_cache
     if coords_cache is None:
         try:
-            with open("backend/data/visualization_coords.json", "r") as f:
+            # Re-use static_path defined above (backend/data)
+            coords_path = os.path.join(static_path, "visualization_coords.json")
+            with open(coords_path, "r") as f:
                 coords_cache = json.load(f)
-        except:
+        except Exception as e:
+            print(f"Coords Load Error: {e}") 
             coords_cache = []
     return coords_cache
 
