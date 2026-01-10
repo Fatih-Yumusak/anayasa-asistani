@@ -10,21 +10,21 @@ export default function FeaturesPage() {
 
                 <TechCard
                     icon={<Cpu />}
-                    title="Gelişmiş LLM"
-                    desc="Qwen2.5-1.5B-Instruct modeli, düşük gecikme süresi ile yüksek doğrulukta Türkçe yanıtlar üretir."
+                    title="Google Gemini 2.0 AI"
+                    desc="En güncel Gemini 2.0 Flash modeli ile ışık hızında analiz ve yüksek doğrulukta yanıt üretimi."
                 />
 
                 <TechCard
                     icon={<Search />}
-                    title="RAG Mimarisi"
-                    desc="Retrieval-Augmented Generation (RAG) ile sadece veri tabanındaki gerçek belgelerden bilgi çeker."
+                    title="Hibrit Arama Motoru"
+                    desc="Hem anlamsal (vektör) hem de anahtar kelime (bm25) tabanlı arama ile %99'a varan erişim başarısı."
                     color="text-blue-600"
                 />
 
                 <TechCard
                     icon={<Database />}
-                    title="Vektör Arama"
-                    desc="ChromaDB ve multilingual-e5-base embedding modeli ile kelime değil, anlam bazlı arama yapar."
+                    title="Anlamsal Analiz Haritası"
+                    desc="t-SNE algoritması ile sorunuzun ve mevzuatın geometrik uzaydaki ilişkisini görselleştirin."
                     color="text-green-600"
                 />
 
@@ -37,8 +37,8 @@ export default function FeaturesPage() {
 
                 <TechCard
                     icon={<Zap />}
-                    title="Hızlı Yanıt"
-                    desc="Optimize edilmiş retrieval pipeline sayesinde sorgular milisaniyeler içinde işlenir."
+                    title="Sunucusuz Mimari"
+                    desc="Vercel Edge ve Google Cloud üzerinde çalışan, anında ölçeklenebilir altyapı."
                     color="text-yellow-600"
                 />
 
