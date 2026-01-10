@@ -60,15 +60,34 @@ class RAGEngine:
         # Sort by Final Score
         candidates.sort(key=lambda x: x["final_score"], reverse=True)
         
-        # Take Top K
-        top_k = candidates[:k]
+        # STRICT FILTERING LOGIC
+        # If the top result is very strong (boosted or high vector score), drop loosely related ones.
+        # This prevents "Madde 82" from appearing when "Madde 1" is the clear answer.
+        
+        final_top_k = []
+        if candidates:
+            best = candidates[0]
+            final_top_k.append(best)
+            
+            # If Best is Boosted (meaning Keyword Match) -> Be very strict with others
+            is_boosted = best["final_score"] > best["vector_score"] + 0.1
+            
+            for other in candidates[1:k]:
+                # If best was a keyword match, only allow others if they are ALSO keyword matches or extremely close
+                if is_boosted:
+                    if other["final_score"] > other["vector_score"] + 0.05: # Also has some keyword overlap
+                         final_top_k.append(other)
+                    elif other["final_score"] > best["final_score"] - 0.05: # Or vector score is basically identical
+                         final_top_k.append(other)
+                else:
+                    # Standard vector search: Just take top K
+                    final_top_k.append(other)
         
         # Re-construct return format
         return {
-            "documents": [[c["text"] for c in top_k]],
-            "metadatas": [[c["metadata"] for c in top_k]],
-            "distances": [[1 - c["vector_score"] for c in top_k]] # Keep original distance for debugging? Or fake it?
-            # Let's return original vector distance to not confuse logic downstream check > 0.6
+            "documents": [[c["text"] for c in final_top_k]],
+            "metadatas": [[c["metadata"] for c in final_top_k]],
+            "distances": [[1 - c["vector_score"] for c in final_top_k]]
         }
 
     def generate_prompt_content(self, question: str, context_docs: list) -> str:
