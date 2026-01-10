@@ -260,7 +260,22 @@ def calculate_vis_data(context_docs):
         target_madde = meta.get("madde")
         target_source = meta.get("source")
         
-        match = next((p for p in all_points if p["madde"] == target_madde and p["source"] == target_source), None)
+        # Robust matching (Handle string/int mismatch and source variations)
+        match = None
+        for p in all_points:
+            # Check Source
+            # If p["source"] is "Anayasa", target must be "Anayasa"
+            # If p["source"] is "TIHEK Kanunu", target might be "TIHEK Kanunu" or "TIHEK"
+            p_src = str(p.get("source", "")).lower()
+            t_src = str(target_source).lower()
+            
+            if p_src not in t_src and t_src not in p_src:
+                continue
+                
+            # Check Madde No
+            if str(p.get("madde")) == str(target_madde):
+                match = p
+                break
         
         if match:
             query_x += match["x"] * score
