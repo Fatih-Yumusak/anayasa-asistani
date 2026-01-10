@@ -201,78 +201,71 @@ export default function Home() {
                   })}
                 </div>
               </div>
-              </div>
-        )}
+            )}
 
-        {/* Semantic Map */}
-        {response.vis_data && (
-          <EmbeddingMap visData={response.vis_data} />
-        )}
-    </div>
-  )
-}
-
-{/* Feature Cards */ }
-{
-  !response && !loading && (
-    <div className="grid md:grid-cols-3 gap-6 w-full max-w-5xl px-4 mt-8">
-      <FeatureCard
-        icon={<Box size={24} className="text-white" />}
-        title="Yapay Zeka Destekli"
-        desc="Modern AI teknolojisiyle hızlı ve doğru sonuçlar"
-      />
-      <FeatureCard
-        icon={<Book size={24} className="text-white" />}
-        title="Kapsamlı Mevzuat"
-        desc="Anayasa belgelerinin tamamı"
-        color="bg-yellow-500"
-      />
-      <FeatureCard
-        icon={<Clock size={24} className="text-white" />}
-        title="Anında Erişim"
-        desc="İhtiyacınız olan bilgiye saniyeler içinde ulaşın"
-        color="bg-red-600"
-      />
-    </div>
-  )
-}
-
-      </main >
-
-
-  {/* Legislation Reader Modal */ }
-{
-  readerState && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 fade-in">
-      <div className="bg-white w-full h-full max-w-5xl rounded-xl shadow-2xl flex flex-col overflow-hidden relative">
-        {/* Header */}
-        <div className="bg-gray-100 p-4 border-b flex justify-between items-center shadow-sm z-10">
-          <div className="flex items-center space-x-2">
-            <Book size={20} className="text-red-600" />
-            <span className="font-bold text-gray-700">
-              {readerState.source} - Mevzuat Okuyucu
-            </span>
+            {/* Semantic Map */}
+            {response.vis_data && (
+              <EmbeddingMap visData={response.vis_data} />
+            )}
           </div>
-          <button
-            onClick={() => setReaderState(null)}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-full transition font-medium"
-          >
-            ✕ Kapat
-          </button>
-        </div>
+        )}
 
-        {/* Reader Content */}
-        <LegislationReader targetId={readerState.targetId} source={readerState.source} />
+        {/* Feature Cards */}
+        {!response && !loading && (
+          <div className="grid md:grid-cols-3 gap-6 w-full max-w-5xl px-4 mt-8">
+            <FeatureCard
+              icon={<Box size={24} className="text-white" />}
+              title="Yapay Zeka Destekli"
+              desc="Modern AI teknolojisiyle hızlı ve doğru sonuçlar"
+            />
+            <FeatureCard
+              icon={<Book size={24} className="text-white" />}
+              title="Kapsamlı Mevzuat"
+              desc="Anayasa belgelerinin tamamı"
+              color="bg-yellow-500"
+            />
+            <FeatureCard
+              icon={<Clock size={24} className="text-white" />}
+              title="Anında Erişim"
+              desc="İhtiyacınız olan bilgiye saniyeler içinde ulaşın"
+              color="bg-red-600"
+            />
+          </div>
+        )}
 
-        {/* Tip */}
-        <div className="bg-yellow-50 text-yellow-800 text-xs p-2 text-center border-t">
-          İlgili madde otomatik olarak vurgulanmıştır.
+      </main>
+
+      {/* Legislation Reader Modal */}
+      {readerState && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 fade-in">
+          <div className="bg-white w-full h-full max-w-5xl rounded-xl shadow-2xl flex flex-col overflow-hidden relative">
+            {/* Header */}
+            <div className="bg-gray-100 p-4 border-b flex justify-between items-center shadow-sm z-10">
+              <div className="flex items-center space-x-2">
+                <Book size={20} className="text-red-600" />
+                <span className="font-bold text-gray-700">
+                  {readerState.source} - Mevzuat Okuyucu
+                </span>
+              </div>
+              <button
+                onClick={() => setReaderState(null)}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-full transition font-medium"
+              >
+                ✕ Kapat
+              </button>
+            </div>
+
+            {/* Reader Content */}
+            <LegislationReader targetId={readerState.targetId} source={readerState.source} />
+
+            {/* Tip */}
+            <div className="bg-yellow-50 text-yellow-800 text-xs p-2 text-center border-t">
+              İlgili madde otomatik olarak vurgulanmıştır.
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  )
-}
-    </div >
   );
 }
 
