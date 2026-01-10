@@ -201,67 +201,78 @@ export default function Home() {
                   })}
                 </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Feature Cards */}
-        {!response && !loading && (
-          <div className="grid md:grid-cols-3 gap-6 w-full max-w-5xl px-4 mt-8">
-            <FeatureCard
-              icon={<Box size={24} className="text-white" />}
-              title="Yapay Zeka Destekli"
-              desc="Modern AI teknolojisiyle hızlı ve doğru sonuçlar"
-            />
-            <FeatureCard
-              icon={<Book size={24} className="text-white" />}
-              title="Kapsamlı Mevzuat"
-              desc="Anayasa belgelerinin tamamı"
-              color="bg-yellow-500"
-            />
-            <FeatureCard
-              icon={<Clock size={24} className="text-white" />}
-              title="Anında Erişim"
-              desc="İhtiyacınız olan bilgiye saniyeler içinde ulaşın"
-              color="bg-red-600"
-            />
-          </div>
-        )}
-
-      </main>
-
-
-      {/* Legislation Reader Modal */}
-      {readerState && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 fade-in">
-          <div className="bg-white w-full h-full max-w-5xl rounded-xl shadow-2xl flex flex-col overflow-hidden relative">
-            {/* Header */}
-            <div className="bg-gray-100 p-4 border-b flex justify-between items-center shadow-sm z-10">
-              <div className="flex items-center space-x-2">
-                <Book size={20} className="text-red-600" />
-                <span className="font-bold text-gray-700">
-                  {readerState.source} - Mevzuat Okuyucu
-                </span>
               </div>
-              <button
-                onClick={() => setReaderState(null)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-full transition font-medium"
-              >
-                ✕ Kapat
-              </button>
-            </div>
+        )}
 
-            {/* Reader Content */}
-            <LegislationReader targetId={readerState.targetId} source={readerState.source} />
-
-            {/* Tip */}
-            <div className="bg-yellow-50 text-yellow-800 text-xs p-2 text-center border-t">
-              İlgili madde otomatik olarak vurgulanmıştır.
-            </div>
-          </div>
-        </div>
-      )}
+        {/* Semantic Map */}
+        {response.vis_data && (
+          <EmbeddingMap visData={response.vis_data} />
+        )}
     </div>
+  )
+}
+
+{/* Feature Cards */ }
+{
+  !response && !loading && (
+    <div className="grid md:grid-cols-3 gap-6 w-full max-w-5xl px-4 mt-8">
+      <FeatureCard
+        icon={<Box size={24} className="text-white" />}
+        title="Yapay Zeka Destekli"
+        desc="Modern AI teknolojisiyle hızlı ve doğru sonuçlar"
+      />
+      <FeatureCard
+        icon={<Book size={24} className="text-white" />}
+        title="Kapsamlı Mevzuat"
+        desc="Anayasa belgelerinin tamamı"
+        color="bg-yellow-500"
+      />
+      <FeatureCard
+        icon={<Clock size={24} className="text-white" />}
+        title="Anında Erişim"
+        desc="İhtiyacınız olan bilgiye saniyeler içinde ulaşın"
+        color="bg-red-600"
+      />
+    </div>
+  )
+}
+
+      </main >
+
+
+  {/* Legislation Reader Modal */ }
+{
+  readerState && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 fade-in">
+      <div className="bg-white w-full h-full max-w-5xl rounded-xl shadow-2xl flex flex-col overflow-hidden relative">
+        {/* Header */}
+        <div className="bg-gray-100 p-4 border-b flex justify-between items-center shadow-sm z-10">
+          <div className="flex items-center space-x-2">
+            <Book size={20} className="text-red-600" />
+            <span className="font-bold text-gray-700">
+              {readerState.source} - Mevzuat Okuyucu
+            </span>
+          </div>
+          <button
+            onClick={() => setReaderState(null)}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-full transition font-medium"
+          >
+            ✕ Kapat
+          </button>
+        </div>
+
+        {/* Reader Content */}
+        <LegislationReader targetId={readerState.targetId} source={readerState.source} />
+
+        {/* Tip */}
+        <div className="bg-yellow-50 text-yellow-800 text-xs p-2 text-center border-t">
+          İlgili madde otomatik olarak vurgulanmıştır.
+        </div>
+      </div>
+    </div>
+  )
+}
+    </div >
   );
 }
 
@@ -334,6 +345,75 @@ function LegislationReader({ targetId, source }: { targetId: string, source: str
   );
 }
 
+
+function EmbeddingMap({ visData }: { visData: any }) {
+  if (!visData || !visData.map_points) return null;
+
+  const points = visData.map_points;
+  const query = visData.query_point;
+
+  // Render SVG scatter plot
+  // Points are normalized 0-1
+  const w = 600;
+  const h = 400;
+
+  return (
+    <div className="mt-8 border-t pt-8">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <Box size={20} className="mr-2 text-indigo-600" /> Anlamsal Analiz Haritası
+      </h3>
+      <div className="relative w-full aspect-video bg-gray-50 rounded-xl border overflow-hidden shadow-inner">
+        {/* SVG Plot */}
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full">
+          {/* Grid Lines */}
+          <line x1="0" y1={h / 2} x2={w} y2={h / 2} stroke="#ddd" strokeWidth="1" strokeDasharray="4 4" />
+          <line x1={w / 2} y1="0" x2={w / 2} y2={h} stroke="#ddd" strokeWidth="1" strokeDasharray="4 4" />
+
+          {/* Legend */}
+          <g transform="translate(20, 20)">
+            <circle cx="0" cy="0" r="4" fill="#ef4444" opacity="0.6" />
+            <text x="10" y="4" fontSize="10" fill="#666">Anayasa</text>
+            <circle cx="0" cy="15" r="4" fill="#3b82f6" opacity="0.6" />
+            <text x="10" y="19" fontSize="10" fill="#666">İnsan Hakları</text>
+            <text x="0" y="40" fontSize="20">⭐️</text>
+            <text x="20" y="38" fontSize="10" fontWeight="bold" fill="#000">Soru</text>
+          </g>
+
+          {/* Document Points */}
+          {points.map((p: any, idx: number) => {
+            const color = (p.source && p.source.includes("Anayasa")) ? "#ef4444" : "#3b82f6";
+            return (
+              <circle
+                key={idx}
+                cx={p.x * w}
+                cy={p.y * h}
+                r={3}
+                fill={color}
+                opacity={0.5}
+                className="hover:opacity-100 transition-opacity"
+              >
+                <title>{p.source} - Madde {p.madde}</title>
+              </circle>
+            );
+          })}
+
+          {/* Query Point */}
+          {query && (
+            <g transform={`translate(${query.x * w}, ${query.y * h})`}>
+              <text x="-10" y="8" fontSize="24" className="animate-bounce">⭐️</text>
+              <circle r="30" fill="none" stroke="orange" strokeWidth="2" strokeDasharray="4 2" opacity="0.5" className="animate-ping" />
+            </g>
+          )}
+        </svg>
+
+        <p className="absolute bottom-2 right-2 text-[10px] text-gray-400 bg-white/80 px-2 rounded">
+          t-SNE Projection (Geometrik Yakınlık Analizi)
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function FeatureCard({ icon, title, desc, color = "bg-red-600" }: { icon: any, title: string, desc: string, color?: string }) {
   return (
     <div className="bg-[#EBEBEB] p-6 rounded-xl flex flex-col items-center text-center shadow-sm hover:shadow-md transition">
@@ -345,3 +425,4 @@ function FeatureCard({ icon, title, desc, color = "bg-red-600" }: { icon: any, t
     </div>
   )
 }
+

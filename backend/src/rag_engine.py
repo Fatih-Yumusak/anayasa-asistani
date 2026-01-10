@@ -73,12 +73,17 @@ class RAGEngine:
             is_boosted = best["final_score"] > best["vector_score"] + 0.1
             
             for other in candidates[1:k]:
-                # If best was a keyword match, only allow others if they are ALSO keyword matches or extremely close
+                # WINNER TAKES ALL Logic
                 if is_boosted:
-                    if other["final_score"] > other["vector_score"] + 0.05: # Also has some keyword overlap
+                    # Only allow others if they are ALSO boosted (keyword match)
+                    # or if they are mathematically identical (score diff < 0.01)
+                    is_other_boosted = other["final_score"] > other["vector_score"] + 0.1
+                    
+                    if is_other_boosted:
                          final_top_k.append(other)
-                    elif other["final_score"] > best["final_score"] - 0.05: # Or vector score is basically identical
+                    elif other["final_score"] > best["final_score"] - 0.01: 
                          final_top_k.append(other)
+                    # Else drop it. No mercy.
                 else:
                     # Standard vector search: Just take top K
                     final_top_k.append(other)
