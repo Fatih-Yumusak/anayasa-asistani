@@ -44,7 +44,7 @@ export default function Home() {
       setProgress(50);
 
       if (contextDocs.length > 0) {
-        setStage(`İlgili ${contextDocs.length} madde bulundu. Cevap üretiliyor...`);
+        setStage(`İlgili ${contextDocs.length} madde bulundu. Cevap ve Harita üretiliyor...`);
       } else {
         setStage("Doğrudan bilgi bulunamadı, genel cevap üretiliyor...");
       }
@@ -60,11 +60,12 @@ export default function Home() {
       // Done
       if (progressTimer) clearInterval(progressTimer);
       setProgress(100);
-      setStage("Tamamlandı.");
+      setStage("İşlem Tamamlandı.");
 
       // Construct final response object compatible with UI
       const finalResult = {
         answer: generateRes.data.answer,
+        vis_data: generateRes.data.vis_data, // Capture vis_data
         sources: contextDocs.map((doc: any) => ({
           madde: doc.madde_no,
           text: doc.text,
@@ -144,7 +145,7 @@ export default function Home() {
             </div>
 
             <p className="text-center text-[10px] text-gray-400 mt-2">
-              Google Gemini AI altyapısı kullanılarak yanıt üretiliyor.
+              Google Gemini AI altyapısı kullanılarak yanıt ve analiz haritası üretiliyor.
             </p>
           </div>
         )}
@@ -204,8 +205,14 @@ export default function Home() {
             )}
 
             {/* Semantic Map */}
-            {response.vis_data && (
+            {response.vis_data ? (
               <EmbeddingMap visData={response.vis_data} />
+            ) : (
+              <div className="mt-8 border-t pt-4 text-center">
+                <p className="text-xs text-gray-400 bg-gray-50 p-2 rounded inline-block">
+                  ⚠️ Anlamsal Analiz Haritası verisi yüklenemedi. (Backend veri dönüşü boş)
+                </p>
+              </div>
             )}
           </div>
         )}

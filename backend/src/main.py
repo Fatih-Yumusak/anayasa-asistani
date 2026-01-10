@@ -302,6 +302,27 @@ def calculate_vis_data(context_docs):
 def health():
     return {"status": "ok"}
 
+@app.get("/api/debug_map")
+def debug_map():
+    """Debug endpoint to check if map data loads."""
+    coords_path = os.path.join(static_path, "visualization_coords.json")
+    exists = os.path.exists(coords_path)
+    
+    data = []
+    error = None
+    try:
+        data = get_coords()
+    except Exception as e:
+        error = str(e)
+        
+    return {
+        "coords_path": coords_path,
+        "exists": exists,
+        "data_count": len(data) if data else 0,
+        "sample": data[:3] if data else [],
+        "load_error": error
+    }
+
 if __name__ == "__main__":
     # Dev run
     uvicorn.run(app, host="0.0.0.0", port=8000)
