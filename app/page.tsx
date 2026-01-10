@@ -144,7 +144,7 @@ export default function Home() {
             </div>
 
             <p className="text-center text-[10px] text-gray-400 mt-2">
-              Qwen2.5-1.5B modeli disk üzerinden çalıştığı için yanıt süresi uzun sürebilir.
+              Google Gemini AI altyapısı kullanılarak yanıt üretiliyor.
             </p>
           </div>
         )}
