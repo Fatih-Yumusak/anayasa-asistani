@@ -57,6 +57,18 @@ class RAGEngine:
                 
             cand["final_score"] += topic_score + text_score
             
+            # --- NEW: Generic "Madde X" Booster ---
+            # If user asks "Madde 3 nedir?", we must boost actual Madde 3
+            import re
+            madde_pattern = re.search(r"madde\s*(\d+)", question.lower())
+            if madde_pattern:
+                target_num = int(madde_pattern.group(1))
+                # Check if this candidate is that madde
+                # cand["metadata"] has 'madde' (int)
+                if cand["metadata"].get("madde") == target_num:
+                    cand["final_score"] += 0.5  # Huge boost -> Guarantees "Winner Takes All" logic
+                    print(f"DEBUG: Boosted Madde {target_num} by +0.5")
+
         # Sort by Final Score
         candidates.sort(key=lambda x: x["final_score"], reverse=True)
         
