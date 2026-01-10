@@ -161,7 +161,7 @@ async def generate_answer(request: GenerateRequest):
     api_key = engine.api_key
     
     # Switch to stable 1.5-flash for better rate limits
-    model_name = "gemini-1.5-flash"
+    model_name = "gemini-1.5-flash-latest"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
     
     payload = {

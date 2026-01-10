@@ -36,10 +36,11 @@ class VectorStoreVercel:
         url = f"https://generativelanguage.googleapis.com/v1beta/{self.model_name}:embedContent?key={self.api_key}"
         
         payload = {
+            "model": f"models/{self.model_name}" if "models/" not in self.model_name else self.model_name,
             "content": {
                 "parts": [{ "text": query_text }]
             },
-            "taskType": "RETRIEVAL_QUERY"
+            "taskType": "retrieval_query" 
         }
         
         try:
@@ -48,6 +49,10 @@ class VectorStoreVercel:
             frame = resp.json()
             # Extract embedding: frame['embedding']['values']
             query_vector = frame['embedding']['values']
+            
+            # DEBUG: Print dims
+            # print(f"Query Dim: {len(query_vector)}")
+            
         except Exception as e:
             print(f"Embedding API Error: {e}")
             # Fallback or empty result to avoid crash
@@ -59,8 +64,14 @@ class VectorStoreVercel:
         query_norm = math.sqrt(sum(x * x for x in query_vector))
         
         scores = []
-        for doc_vec in self.vectors:
+        for i, doc_vec in enumerate(self.vectors):
+            # Ensure doc_vec is float list
+            # doc_vec = [float(x) for x in doc_vec] # Expensive loop? Assuming they are already.
+            
             # Dot Product
+            # Optimization: Pre-compute doc norms? Too much RAM? 
+            # Doing it on the fly is O(N*D).
+            
             dot_product = sum(a * b for a, b in zip(doc_vec, query_vector))
             # Doc vectors are usually normalized by embedding model, but let's be safe?
             # Assuming pre-computed vectors are normalized or we trust dot product for ranking if query is normalized.
