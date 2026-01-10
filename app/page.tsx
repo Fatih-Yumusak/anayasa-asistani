@@ -375,8 +375,11 @@ function EmbeddingMap({ visData }: { visData: any }) {
             <text x="10" y="4" fontSize="10" fill="#666">Anayasa</text>
             <circle cx="0" cy="15" r="4" fill="#3b82f6" opacity="0.6" />
             <text x="10" y="19" fontSize="10" fill="#666">İnsan Hakları</text>
-            <text x="0" y="40" fontSize="20">⭐️</text>
-            <text x="20" y="38" fontSize="10" fontWeight="bold" fill="#000">Soru</text>
+
+            {/* Query Legend Item */}
+            <circle cx="0" cy="35" r="3" fill="#000000" stroke="#fff" strokeWidth="1" />
+            <circle cx="0" cy="35" r="7" fill="none" stroke="#000000" strokeWidth="0.5" opacity="0.5" strokeDasharray="2 2" />
+            <text x="12" y="38" fontSize="10" fontWeight="bold" fill="#000">Sorgu</text>
           </g>
 
           {/* Document Points */}
@@ -397,11 +400,19 @@ function EmbeddingMap({ visData }: { visData: any }) {
             );
           })}
 
-          {/* Query Point */}
+          {/* Query Point - Professional Marker */}
           {query && (
             <g transform={`translate(${query.x * w}, ${query.y * h})`}>
-              <text x="-10" y="8" fontSize="24" className="animate-bounce">⭐️</text>
-              <circle r="30" fill="none" stroke="orange" strokeWidth="2" strokeDasharray="4 2" opacity="0.5" className="animate-ping" />
+              {/* Precise Center Point */}
+              <circle r="4" fill="#000000" stroke="#ffffff" strokeWidth="1.5" />
+
+              {/* Outer Ring (Static) */}
+              <circle r="12" fill="none" stroke="#000000" strokeWidth="1" opacity="0.3" strokeDasharray="2 2" />
+
+              {/* Label */}
+              <text x="8" y="4" fontSize="10" fontWeight="bold" fill="#000000" style={{ textShadow: "0px 0px 4px white" }}>
+                Sorgu Konumu
+              </text>
             </g>
           )}
         </svg>
