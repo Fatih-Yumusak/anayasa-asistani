@@ -62,6 +62,23 @@ def get_engine():
             raise HTTPException(status_code=500, detail=f"Engine Init Failed: {str(e)}")
     return engine
 
+# Visualization Data Helper
+import json
+coords_cache = None
+def get_coords():
+    global coords_cache
+    if coords_cache is None:
+        try:
+            with open("backend/data/visualization_coords.json", "r") as f:
+                coords_cache = json.load(f)
+        except:
+            coords_cache = []
+    return coords_cache
+
+class VisData(BaseModel):
+    map_points: list
+    query_point: dict
+
 class RetrieveRequest(BaseModel):
     question: str
 
@@ -76,6 +93,7 @@ class GenerateRequest(BaseModel):
 class GenerateResponse(BaseModel):
     answer: str
     prompt: str
+    vis_data: VisData = None # Optional visual data
 
 @app.post("/api/retrieve", response_model=RetrieveResponse)
 async def retrieve_context(request: RetrieveRequest):
