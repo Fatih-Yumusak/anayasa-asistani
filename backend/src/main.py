@@ -160,8 +160,8 @@ async def generate_answer(request: GenerateRequest):
     # Need API Key. defined in engine?
     api_key = engine.api_key
     
-    # Models to try in order
-    models_to_try = ["gemini-1.5-flash", "gemini-1.0-pro", "gemini-pro"]
+    # Models to try in order (Based on available models for this Key)
+    models_to_try = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-flash-latest"]
     
     last_error = None
     
