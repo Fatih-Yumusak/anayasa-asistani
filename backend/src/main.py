@@ -160,23 +160,28 @@ async def generate_answer(request: GenerateRequest):
     # Need API Key. defined in engine?
     api_key = engine.api_key
     
-    # Switch to stable 1.5-flash for better rate limits
-    model_name = "gemini-1.5-flash-latest"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+    # Models to try in order
+    models_to_try = ["gemini-1.5-flash", "gemini-1.0-pro", "gemini-pro"]
     
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt_text}]
-        }]
-    }
+    last_error = None
     
-    max_retries = 3
-    for attempt in range(max_retries):
+    for model_name in models_to_try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+        
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt_text}]
+            }]
+        }
+        
         try:
+            print(f"Trying model: {model_name}")
             resp = requests.post(url, json=payload, timeout=30)
             
             if resp.status_code == 429:
-                print(f"Rate Limit Hit (429). Retrying in 2s... ({attempt+1}/{max_retries})")
+                # Rate limit? Wait and try next model or same?
+                # Let's simple wait and continue matching loop or retry same?
+                # For simplicity, move to next model if this one is busy/rate limited
                 time.sleep(2)
                 continue
                 
@@ -184,14 +189,21 @@ async def generate_answer(request: GenerateRequest):
             data = resp.json()
             answer = data['candidates'][0]['content']['parts'][0]['text']
             
-            return GenerateResponse(answer=answer, prompt=prompt_text)
+            # Success!
+            # Append Debug info about retrieval confidence
+            scores = [f"%{int(d['score']*100)}" for d in request.context_docs[:3]]
+            debug_footer = f"\n\n(AI Güveni: {', '.join(scores)} - Model: {model_name})"
+            
+            return GenerateResponse(answer=answer + debug_footer, prompt=prompt_text)
             
         except Exception as e:
-            if attempt == max_retries - 1:
-                # Sanitize error message (remove API key)
-                err_msg = str(e).replace(api_key, "HIDDEN_KEY")
-                return GenerateResponse(answer=f"Google API Hatası (Yoğunluk): {err_msg}", prompt=prompt_text)
+            print(f"Model {model_name} failed: {e}")
+            last_error = e
             time.sleep(1)
+
+    # If all failed
+    err_msg = str(last_error).replace(api_key, "HIDDEN_KEY")
+    return GenerateResponse(answer=f"Üzgünüm, tüm yapay zeka modelleri şu an meşgul veya erişilemez durumda. Hata: {err_msg}", prompt=prompt_text)
 
 # Keep legacy endpoint for backward compat if needed, but Frontend will switch
 # Removed @app.post("/api/chat") ... to force switch and save space.
