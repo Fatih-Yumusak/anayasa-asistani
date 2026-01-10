@@ -359,20 +359,44 @@ function EmbeddingMap({ visData }: { visData: any }) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const textVisible = scale > 2.5; // Threshold to show labels
+  const textVisible = scale > 1.5; // Show labels earlier
+
+  // Base dimensions
+  const w = 600;
+  const h = 400;
+
+  // Smart Zoom: Zooms towards the center of the current view
+  const applyZoom = (factor: number) => {
+    const newScale = Math.min(Math.max(scale * factor, 1), 10);
+    if (newScale === scale) return;
+
+    // Calculate center of view
+    // Current center in data coordinates:
+    // (w/2 - pan_x) / scale
+    const centerX = (w / 2 - panning.x) / scale;
+    const centerY = (h / 2 - panning.y) / scale;
+
+    // Calculate new pan to keep center fixed
+    // new_pan = w/2 - centerX * newScale
+    const newPanX = w / 2 - centerX * newScale;
+    const newPanY = h / 2 - centerY * newScale;
+
+    setScale(newScale);
+    setPanning({ x: newPanX, y: newPanY });
+  };
+
+  const zoomIn = () => applyZoom(1.5);
+  const zoomOut = () => applyZoom(1 / 1.5);
+  const resetZoom = () => {
+    setScale(1);
+    setPanning({ x: 0, y: 0 });
+  };
 
   const handleWheel = (e: React.WheelEvent) => {
     // Prevent page scroll only if we decide to capture it (optional)
     // e.preventDefault(); 
     // Implementation of simple zoom on wheel is tricky without blocking scroll.
     // Let's stick to buttons for main control for better UX on long page.
-  };
-
-  const zoomIn = () => setScale(s => Math.min(s * 1.5, 10)); // Max 10x
-  const zoomOut = () => setScale(s => Math.max(s / 1.5, 1)); // Min 1x, reset to 1
-  const resetZoom = () => {
-    setScale(1);
-    setPanning({ x: 0, y: 0 });
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -393,10 +417,6 @@ function EmbeddingMap({ visData }: { visData: any }) {
     setIsDragging(false);
   };
 
-  // Base dimensions
-  const w = 600;
-  const h = 400;
-
   return (
     <div className="mt-8 border-t pt-8">
       <div className="flex justify-between items-center mb-4">
@@ -404,10 +424,10 @@ function EmbeddingMap({ visData }: { visData: any }) {
           <Box size={20} className="mr-2 text-indigo-600" /> Anlamsal Analiz Haritası
         </h3>
         {/* Controls */}
-        <div className="flex space-x-2">
-          <button onClick={zoomIn} className="p-1 bg-gray-100 rounded hover:bg-gray-200 border" title="Yakınlaş">➕</button>
-          <button onClick={zoomOut} className="p-1 bg-gray-100 rounded hover:bg-gray-200 border" title="Uzaklaş">➖</button>
-          <button onClick={resetZoom} className="p-1 bg-gray-100 rounded hover:bg-gray-200 border text-xs px-2" title="Sıfırla">Sıfırla</button>
+        <div className="flex space-x-2 bg-gray-100 rounded-lg p-1 border">
+          <button onClick={zoomIn} className="w-8 h-8 flex items-center justify-center bg-white rounded shadow-sm hover:bg-gray-50 font-bold text-gray-700" title="Yakınlaş">＋</button>
+          <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center bg-white rounded shadow-sm hover:bg-gray-50 font-bold text-gray-700" title="Uzaklaş">－</button>
+          <button onClick={resetZoom} className="px-3 h-8 flex items-center justify-center bg-white rounded shadow-sm hover:bg-gray-50 text-xs font-semibold text-gray-600" title="Haritayı Sıfırla">Sıfırla</button>
         </div>
       </div>
 
@@ -441,12 +461,16 @@ function EmbeddingMap({ visData }: { visData: any }) {
                   {/* Conditional Label */}
                   {textVisible && (
                     <text
-                      x={5 / scale}
-                      y={1 / scale}
-                      fontSize={8 / scale} // Text stays readable size relative to view
-                      fill="#444"
-                      opacity={0.8}
+                      x={4 / scale}
+                      y={2 / scale}
+                      fontSize={12 / scale} // Larger font size
+                      fontWeight="bold"
+                      fill="#333"
                       pointerEvents="none"
+                      style={{
+                        textShadow:
+                          `1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff`
+                      }}
                     >
                       {p.madde}
                     </text>
