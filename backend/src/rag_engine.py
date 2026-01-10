@@ -72,21 +72,30 @@ class RAGEngine:
             # If Best is Boosted (meaning Keyword Match) -> Be very strict with others
             is_boosted = best["final_score"] > best["vector_score"] + 0.1
             
+            # STRICT Relevance Cutoff
+            # Logic: If the best result is "Good Enough" (boosted or high score), 
+            # we should NOT dilute it with mediocre results.
+            
+            best_is_very_strong = best["final_score"] > 0.85 or is_boosted
+            
             for other in candidates[1:k]:
-                # WINNER TAKES ALL Logic
-                if is_boosted:
-                    # Only allow others if they are ALSO boosted (keyword match)
-                    # or if they are mathematically identical (score diff < 0.01)
-                    is_other_boosted = other["final_score"] > other["vector_score"] + 0.1
-                    
-                    if is_other_boosted:
+                if best_is_very_strong:
+                     # If best is strong, ONLY accept other STRONG matches.
+                     # 1. Must be keyword boosted
+                     # 2. OR Must be within 1% score of the best (mathematically identical)
+                     is_other_good = (
+                         (other["final_score"] > other["vector_score"] + 0.1) or # Is Boosted
+                         (other["final_score"] > best["final_score"] - 0.01)     # Identical Score
+                     )
+                     
+                     if is_other_good:
                          final_top_k.append(other)
-                    elif other["final_score"] > best["final_score"] - 0.01: 
-                         final_top_k.append(other)
-                    # Else drop it. No mercy.
+                     # Else: Drop it.
                 else:
-                    # Standard vector search: Just take top K
-                    final_top_k.append(other)
+                    # If best is weak (e.g. 0.7), maybe we are seeking broadly.
+                    # But still, don't include trash. Cutoff at 15% drop.
+                    if other["final_score"] > best["final_score"] - 0.15:
+                        final_top_k.append(other)
         
         # Re-construct return format
         return {

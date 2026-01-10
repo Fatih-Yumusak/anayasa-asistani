@@ -278,9 +278,14 @@ def calculate_vis_data(context_docs):
                 break
         
         if match:
-            query_x += match["x"] * score
-            query_y += match["y"] * score
-            total_score += score
+            # Weight the Top-1 result significantly more to prevent drift
+            # If doc is Top-1 (implied by order usually, but let's use explicit score)
+            # Use score^4 to punish lower scores heavily in the centroid
+            weighted_score = score ** 4 
+            
+            query_x += match["x"] * weighted_score
+            query_y += match["y"] * weighted_score
+            total_score += weighted_score
             
     if total_score > 0:
         query_x /= total_score
