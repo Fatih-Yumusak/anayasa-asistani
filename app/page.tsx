@@ -346,79 +346,153 @@ function LegislationReader({ targetId, source }: { targetId: string, source: str
 }
 
 
+// Interactive Map Component
 function EmbeddingMap({ visData }: { visData: any }) {
   if (!visData || !visData.map_points) return null;
 
   const points = visData.map_points;
   const query = visData.query_point;
 
-  // Render SVG scatter plot
-  // Points are normalized 0-1
+  // Zoom / Pan State
+  const [scale, setScale] = useState(1);
+  const [panning, setPanning] = useState({ x: 0, y: 0 }); // Offset
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const textVisible = scale > 2.5; // Threshold to show labels
+
+  const handleWheel = (e: React.WheelEvent) => {
+    // Prevent page scroll only if we decide to capture it (optional)
+    // e.preventDefault(); 
+    // Implementation of simple zoom on wheel is tricky without blocking scroll.
+    // Let's stick to buttons for main control for better UX on long page.
+  };
+
+  const zoomIn = () => setScale(s => Math.min(s * 1.5, 10)); // Max 10x
+  const zoomOut = () => setScale(s => Math.max(s / 1.5, 1)); // Min 1x, reset to 1
+  const resetZoom = () => {
+    setScale(1);
+    setPanning({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panning.x, y: e.clientY - panning.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    setPanning({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Base dimensions
   const w = 600;
   const h = 400;
 
   return (
     <div className="mt-8 border-t pt-8">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        <Box size={20} className="mr-2 text-indigo-600" /> Anlamsal Analiz Haritası
-      </h3>
-      <div className="relative w-full aspect-video bg-gray-50 rounded-xl border overflow-hidden shadow-inner">
-        {/* SVG Plot */}
-        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full">
-          {/* Grid Lines */}
-          <line x1="0" y1={h / 2} x2={w} y2={h / 2} stroke="#ddd" strokeWidth="1" strokeDasharray="4 4" />
-          <line x1={w / 2} y1="0" x2={w / 2} y2={h} stroke="#ddd" strokeWidth="1" strokeDasharray="4 4" />
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+          <Box size={20} className="mr-2 text-indigo-600" /> Anlamsal Analiz Haritası
+        </h3>
+        {/* Controls */}
+        <div className="flex space-x-2">
+          <button onClick={zoomIn} className="p-1 bg-gray-100 rounded hover:bg-gray-200 border" title="Yakınlaş">➕</button>
+          <button onClick={zoomOut} className="p-1 bg-gray-100 rounded hover:bg-gray-200 border" title="Uzaklaş">➖</button>
+          <button onClick={resetZoom} className="p-1 bg-gray-100 rounded hover:bg-gray-200 border text-xs px-2" title="Sıfırla">Sıfırla</button>
+        </div>
+      </div>
 
-          {/* Legend */}
+      <div
+        className="relative w-full aspect-video bg-gray-50 rounded-xl border overflow-hidden shadow-inner cursor-grab active:cursor-grabbing"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        {/* SVG Plot */}
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full select-none">
+          {/* Semantic Zoom Transform Group */}
+          <g transform={`translate(${panning.x}, ${panning.y}) scale(${scale})`}>
+
+            {/* Background Grid (Fixed relative to data, moves with pan/zoom) */}
+            <line x1="0" y1={h / 2} x2={w} y2={h / 2} stroke="#ddd" strokeWidth={1 / scale} strokeDasharray="4 4" />
+            <line x1={w / 2} y1="0" x2={w / 2} y2={h} stroke="#ddd" strokeWidth={1 / scale} strokeDasharray="4 4" />
+
+            {/* Document Points */}
+            {points.map((p: any, idx: number) => {
+              const color = (p.source && p.source.includes("Anayasa")) ? "#ef4444" : "#3b82f6";
+              return (
+                <g key={idx} transform={`translate(${p.x * w}, ${p.y * h})`}>
+                  <circle
+                    r={3 / Math.sqrt(scale)} // Keep dots constant physical size or slightly smaller
+                    fill={color}
+                    opacity={0.6}
+                    className="hover:opacity-100 transition-opacity"
+                  />
+                  {/* Conditional Label */}
+                  {textVisible && (
+                    <text
+                      x={5 / scale}
+                      y={1 / scale}
+                      fontSize={8 / scale} // Text stays readable size relative to view
+                      fill="#444"
+                      opacity={0.8}
+                      pointerEvents="none"
+                    >
+                      {p.madde}
+                    </text>
+                  )}
+                  <title>{p.source} - Madde {p.madde}</title>
+                </g>
+              );
+            })}
+
+            {/* Query Point - Professional Marker */}
+            {query && (
+              <g transform={`translate(${query.x * w}, ${query.y * h})`}>
+                {/* Precise Center Point */}
+                <circle r={4 / scale} fill="#000000" stroke="#ffffff" strokeWidth={1.5 / scale} />
+
+                {/* Outer Ring (Static) */}
+                <circle r={12 / scale} fill="none" stroke="#000000" strokeWidth={1 / scale} opacity="0.3" strokeDasharray="2 2" />
+
+                {/* Label */}
+                <text x={8 / scale} y={4 / scale} fontSize={10 / scale} fontWeight="bold" fill="#000000" style={{ textShadow: "0px 0px 4px white" }}>
+                  Sorgu Konumu
+                </text>
+              </g>
+            )}
+
+          </g> {/* End Transform Group */}
+
+
+          {/* Static Legend (Stays fixed on screen, outside transform) */}
           <g transform="translate(20, 20)">
+            <rect x="-5" y="-5" width="100" height="60" fill="white" opacity="0.8" rx="4" />
+
             <circle cx="0" cy="0" r="4" fill="#ef4444" opacity="0.6" />
             <text x="10" y="4" fontSize="10" fill="#666">Anayasa</text>
+
             <circle cx="0" cy="15" r="4" fill="#3b82f6" opacity="0.6" />
             <text x="10" y="19" fontSize="10" fill="#666">İnsan Hakları</text>
 
             {/* Query Legend Item */}
             <circle cx="0" cy="35" r="3" fill="#000000" stroke="#fff" strokeWidth="1" />
-            <circle cx="0" cy="35" r="7" fill="none" stroke="#000000" strokeWidth="0.5" opacity="0.5" strokeDasharray="2 2" />
             <text x="12" y="38" fontSize="10" fontWeight="bold" fill="#000">Sorgu</text>
           </g>
-
-          {/* Document Points */}
-          {points.map((p: any, idx: number) => {
-            const color = (p.source && p.source.includes("Anayasa")) ? "#ef4444" : "#3b82f6";
-            return (
-              <circle
-                key={idx}
-                cx={p.x * w}
-                cy={p.y * h}
-                r={3}
-                fill={color}
-                opacity={0.5}
-                className="hover:opacity-100 transition-opacity"
-              >
-                <title>{p.source} - Madde {p.madde}</title>
-              </circle>
-            );
-          })}
-
-          {/* Query Point - Professional Marker */}
-          {query && (
-            <g transform={`translate(${query.x * w}, ${query.y * h})`}>
-              {/* Precise Center Point */}
-              <circle r="4" fill="#000000" stroke="#ffffff" strokeWidth="1.5" />
-
-              {/* Outer Ring (Static) */}
-              <circle r="12" fill="none" stroke="#000000" strokeWidth="1" opacity="0.3" strokeDasharray="2 2" />
-
-              {/* Label */}
-              <text x="8" y="4" fontSize="10" fontWeight="bold" fill="#000000" style={{ textShadow: "0px 0px 4px white" }}>
-                Sorgu Konumu
-              </text>
-            </g>
-          )}
         </svg>
 
-        <p className="absolute bottom-2 right-2 text-[10px] text-gray-400 bg-white/80 px-2 rounded">
-          t-SNE Projection (Geometrik Yakınlık Analizi)
+        <p className="absolute bottom-2 right-2 text-[10px] text-gray-400 bg-white/80 px-2 rounded pointer-events-none">
+          Scale: {scale.toFixed(1)}x
         </p>
       </div>
     </div>
