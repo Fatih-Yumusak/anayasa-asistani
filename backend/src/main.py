@@ -194,7 +194,9 @@ async def generate_answer(request: GenerateRequest):
             scores = [f"%{int(d['score']*100)}" for d in request.context_docs[:3]]
             debug_footer = f"\n\n(AI Güveni: {', '.join(scores)} - Model: {model_name})"
             
-            return GenerateResponse(answer=answer + debug_footer, prompt=prompt_text)
+            vis_data = calculate_vis_data(request.context_docs)
+            
+            return GenerateResponse(answer=answer + debug_footer, prompt=prompt_text, vis_data=vis_data)
             
         except Exception as e:
             print(f"Model {model_name} failed: {e}")
@@ -202,8 +204,60 @@ async def generate_answer(request: GenerateRequest):
             time.sleep(1)
 
     # If all failed
-    err_msg = str(last_error).replace(api_key, "HIDDEN_KEY")
-    return GenerateResponse(answer=f"Üzgünüm, tüm yapay zeka modelleri şu an meşgul veya erişilemez durumda. Hata: {err_msg}", prompt=prompt_text)
+    if last_error:
+        err_msg = str(last_error).replace(api_key, "HIDDEN_KEY")
+        answer = f"Üzgünüm, tüm yapay zeka modelleri şu an meşgul veya erişilemez durumda. Hata: {err_msg}"
+    else:
+        answer = "Beklenmedik hata."
+
+    # Even on error, return structure
+    return GenerateResponse(answer=answer, prompt=prompt_text)
+
+# Helper to calculate Vis Data
+def calculate_vis_data(context_docs):
+    all_points = get_coords()
+    if not all_points or not context_docs:
+        return None
+        
+    # Find matching points for context docs
+    # context_docs have 'text' and 'metadata'. We match by ? ID is not in context_docs directly usually?
+    # RAGEngine returns text/metadata. Metadata has 'source' and 'madde'.
+    # Our coords have 'source' and 'madde'.
+    
+    nearby_points = []
+    
+    # Simple matching (Naive O(N*M)) - acceptable for small N/M
+    query_x = 0
+    query_y = 0
+    total_score = 0
+    
+    for doc in context_docs:
+        meta = doc.get("metadata", {})
+        score = doc.get("score", 0.5)
+        
+        # Find coords
+        target_madde = meta.get("madde")
+        target_source = meta.get("source")
+        
+        match = next((p for p in all_points if p["madde"] == target_madde and p["source"] == target_source), None)
+        
+        if match:
+            query_x += match["x"] * score
+            query_y += match["y"] * score
+            total_score += score
+            
+    if total_score > 0:
+        query_x /= total_score
+        query_y /= total_score
+    else:
+        # Fallback center
+        query_x = 0.5
+        query_y = 0.5
+        
+    return VisData(
+        map_points=all_points,
+        query_point={"x": query_x, "y": query_y, "label": "Soru"}
+    )
 
 # Keep legacy endpoint for backward compat if needed, but Frontend will switch
 # Removed @app.post("/api/chat") ... to force switch and save space.
